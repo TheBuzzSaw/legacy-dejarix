@@ -90,8 +90,6 @@
 		<Unit filename="code/ShaderVBO.h" />
 		<Unit filename="code/SoundEngine.cpp" />
 		<Unit filename="code/SoundEngine.h" />
-		<Unit filename="code/Sprite.cpp" />
-		<Unit filename="code/Sprite.h" />
 		<Unit filename="code/TestModule.cpp" />
 		<Unit filename="code/TestModule.h" />
 		<Unit filename="code/Thread.cpp" />
