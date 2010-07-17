@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Dejarix (ubu64)" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../dejarix-ubu64-debug" prefix_auto="1" extension_auto="1" />
+				<Option working_dir=".." />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../dejarix-ubu64" prefix_auto="1" extension_auto="1" />
+				<Option working_dir=".." />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="/usr/include/SDL" />
+			<Add directory="/usr/include/lua5.1" />
+		</Compiler>
+		<Linker>
+			<Add library="GL" />
+			<Add library="GLU" />
+			<Add library="SDLmain" />
+			<Add library="SDL_image" />
+			<Add library="SDL_mixer" />
+			<Add library="SDL_net" />
+			<Add library="SDL_ttf" />
+			<Add library="SDL" />
+			<Add library="lua5.1" />
+			<Add library="boost_system" />
+			<Add library="boost_filesystem" />
+		</Linker>
+		<Unit filename="code/Camera.cpp" />
+		<Unit filename="code/Camera.h" />
+		<Unit filename="code/CardModel.cpp" />
+		<Unit filename="code/CardModel.h" />
+		<Unit filename="code/Config.cpp" />
+		<Unit filename="code/Config.h" />
+		<Unit filename="code/DisplayEngine.cpp" />
+		<Unit filename="code/DisplayEngine.h" />
+		<Unit filename="code/GLee.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="code/GLee.h" />
+		<Unit filename="code/GameServer.cpp" />
+		<Unit filename="code/GameServer.h" />
+		<Unit filename="code/IndexVBO.cpp" />
+		<Unit filename="code/IndexVBO.h" />
+		<Unit filename="code/LoadScreen.cpp" />
+		<Unit filename="code/LoadScreen.h" />
+		<Unit filename="code/LogFile.cpp" />
+		<Unit filename="code/LogFile.h" />
+		<Unit filename="code/LuaMachine.cpp" />
+		<Unit filename="code/LuaMachine.h" />
+		<Unit filename="code/MathEngine.cpp" />
+		<Unit filename="code/MathEngine.h" />
+		<Unit filename="code/Matrix.h" />
+		<Unit filename="code/Matrix3D.cpp" />
+		<Unit filename="code/Matrix3D.h" />
+		<Unit filename="code/MatrixStack.cpp" />
+		<Unit filename="code/MatrixStack.h" />
+		<Unit filename="code/Module.cpp" />
+		<Unit filename="code/Module.h" />
+		<Unit filename="code/NetworkStream.cpp" />
+		<Unit filename="code/NetworkStream.h" />
+		<Unit filename="code/OGL.h" />
+		<Unit filename="code/Shader.cpp" />
+		<Unit filename="code/Shader.h" />
+		<Unit filename="code/ShaderProgram.cpp" />
+		<Unit filename="code/ShaderProgram.h" />
+		<Unit filename="code/ShaderVBO.cpp" />
+		<Unit filename="code/ShaderVBO.h" />
+		<Unit filename="code/SoundEngine.cpp" />
+		<Unit filename="code/SoundEngine.h" />
+		<Unit filename="code/Sprite.cpp" />
+		<Unit filename="code/Sprite.h" />
+		<Unit filename="code/TestModule.cpp" />
+		<Unit filename="code/TestModule.h" />
+		<Unit filename="code/Thread.cpp" />
+		<Unit filename="code/Thread.h" />
+		<Unit filename="code/Vector2D.h" />
+		<Unit filename="code/Vector3D.h" />
+		<Unit filename="code/main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<lib_finder disable_auto="1" />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
