@@ -22,6 +22,7 @@
 #include "ShaderProgram.h"
 #include "CardModel.h"
 #include "MatrixStack.h"
+#include "Camera.h"
 
 class TestModule : public Module
 {
@@ -38,16 +39,21 @@ class TestModule : public Module
         virtual void onUnload();
 
     protected:
+        virtual void onMouseWheel(bool inUp, bool inDown);
 
     private:
         void loadCardImage(const char* inFile, GLuint inTexture);
 
+        Camera mCamera;
         MatrixStack mModelView;
         Matrix3D mProjection;
         Matrix3D mMVPM;
         ShaderProgram mCardProgram;
+        GLint mUniformUseTexture;
+        GLint mUniformCardColor;
+        ShaderVBO mTable;
         CardModel mCard;
-        GLuint mTextures[2];
+        GLuint mTextures[3];
         float mRotation;
 };
 

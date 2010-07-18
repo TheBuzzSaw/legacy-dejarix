@@ -57,12 +57,12 @@ class Matrix3D
 
         inline float& operator()(size_t inRow, size_t inCol)
         {
-            return mData[inRow * 4 + inCol];
+            return mData[inCol * 4 + inRow];
         }
 
         inline float operator()(size_t inRow, size_t inCol) const
         {
-            return mData[inRow * 4 + inCol];
+            return mData[inCol * 4 + inRow];
         }
 
         inline bool operator==(const Matrix3D& inMatrix) const

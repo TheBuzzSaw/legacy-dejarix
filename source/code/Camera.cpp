@@ -18,7 +18,7 @@
 #include "Camera.h"
 #include "OGL.h"
 
-Camera::Camera() : mZoom(1.0f)
+Camera::Camera()
 {
 }
 
@@ -29,13 +29,32 @@ Camera::~Camera()
 void Camera::update()
 {
     mMatrix.loadIdentity();
-    mMatrix.scale(mZoom);
-    mMatrix.translate(-mFocus[0], -mFocus[1], 0.0f);
+    mMatrix.translate(0.0f, 0.0f, -mTrackball[2]);
+    mMatrix.rotateX(mTrackball[0]);
+    mMatrix.rotateY(mTrackball[1]);
+    mMatrix.translate(-mFocus[0], -mFocus[1], -mFocus[2]);
+}
+
+void Camera::spin(float inOffset)
+{
+    mTrackball[1] += inOffset;
+    if (mTrackball[1] > 180.0f)
+        mTrackball[1] -= 360.0f;
+    else if (mTrackball[1] < -180.0f)
+        mTrackball[1] += 360.0f;
+}
+
+void Camera::rise(float inOffset)
+{
+    mTrackball[0] += inOffset;
+    if (mTrackball[0] > 0.0f)
+        mTrackball[0] = 0.0f;
+    else if (mTrackball[0] < -90.0f)
+        mTrackball[0] = -90.0f;
 }
 
 void Camera::zoom(float inOffset)
 {
-    mZoom += inOffset;
-    if (mZoom < 0.0f) mZoom = 0.0f;
-    glPointSize(mZoom);
+    mTrackball[2] += inOffset;
+    if (mTrackball[2] < 0.0f) mTrackball[2] = 0.0f;
 }

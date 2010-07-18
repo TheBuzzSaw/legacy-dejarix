@@ -88,7 +88,7 @@ void ShaderProgram::bindAndLink()
 
 void ShaderProgram::setMatrix(const Matrix3D& inMatrix)
 {
-    glUniformMatrix4fv(mUniformMatrix, 1, GL_TRUE, inMatrix.array());
+    glUniformMatrix4fv(mUniformMatrix, 1, GL_FALSE, inMatrix.array());
 }
 
 GLuint ShaderProgram::getBinding(const string& inName) const

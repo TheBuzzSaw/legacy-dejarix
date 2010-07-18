@@ -33,29 +33,45 @@ TestModule::~TestModule()
 void TestModule::onLoad()
 {
     glGenTextures(2, mTextures);
-    loadCardImage("localuprising.gif", mTextures[0]);
-    loadCardImage("liberation.gif", mTextures[1]);
+    DisplayEngine::loadTexture("data/images/wood.jpg", mTextures[0]);
+    loadCardImage("localuprising.gif", mTextures[1]);
+    loadCardImage("liberation.gif", mTextures[2]);
+
 
     mCardProgram.attachShader("card.vs");
     mCardProgram.attachShader("card.fs");
     mCardProgram.addVariable("CardVertex");
     mCardProgram.addVariable("CardTextureCoordinate");
     mCardProgram.bindAndLink();
+    mUniformUseTexture = mCardProgram.getUniformLocation("UseTexture");
+    mUniformCardColor = mCardProgram.getUniformLocation("CardColor");
     CardModel::setUniforms(mCardProgram.getUniformLocation("CardTexture"),
-        mCardProgram.getUniformLocation("UseTexture"),
-        mCardProgram.getUniformLocation("CardColor"));
+        mUniformUseTexture, mUniformCardColor);
     mCard.build(mCardProgram);
 
-    mProjection.perspective(30.0f, DisplayEngine::getAspectRatio(), 1.0f, 1000.0f);
-    //mProjection.orthographic(5.0f, DisplayEngine::getAspectRatio());
+    GLfloat tableVertices[12] = {
+        100.0f, 100.0f, 0.0f,
+        100.0f, -100.0f, 0.0f,
+        -100.0f, -100.0f, 0.0f,
+        -100.0f, 100.0f, 0.0f};
+
+    GLfloat tableTextures[8] = {
+        0.0f, 0.0f, 20.0f, 0.0f,
+        20.0f, 20.0f, 0.0f, 20.0f};
+
+    mTable.loadVAA(mCardProgram.getBinding("CardVertex"), 3, 4, tableVertices);
+    mTable.loadVAA(mCardProgram.getBinding("CardTextureCoordinate"), 2, 4,
+        tableTextures);
+
+    mProjection.perspective(30.0f, DisplayEngine::getAspectRatio(), 1.0f,
+        1000.0f);
     mModelView.reset();
-    mModelView.matrix().translate(0.0f, 0.0f, -20.0f);
-    mRotation = 0.0f;
+    mCamera.zoom(18.0f);
 }
 
 void TestModule::onUnload()
 {
-    glDeleteTextures(2, mTextures);
+    glDeleteTextures(3, mTextures);
 }
 
 void TestModule::onOpen()
@@ -81,19 +97,29 @@ void TestModule::onLoop()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     mModelView.push();
-    mModelView.matrix().rotateY(mRotation);
-    mModelView.matrix().scale(1.0f, 1.0f, 10.0f);
-    //mModelView.matrix().scale(5.0f);
+    mModelView.matrix().multiply(mCamera.matrix());
+
+    mModelView.push();
+    mModelView.matrix().translate(0.0f, 0.0f, 0.25f);
     (mMVPM = mProjection).multiply(mModelView.matrix());
     mCardProgram.setMatrix(mMVPM);
-    mCard.display(mTextures[0], mTextures[1]);
+    mCard.display(mTextures[1], mTextures[2]);
+    mModelView.pop();
+
+    static const Vector3D<float> tableColor(0.0f);
+    glUniform1i(mUniformUseTexture, 1);
+    glUniform4fv(mUniformCardColor, 1, tableColor.array());
+    (mMVPM = mProjection).multiply(mModelView.matrix());
+    mCardProgram.setMatrix(mMVPM);
+    glBindTexture(GL_TEXTURE_2D, mTextures[0]);
+    mTable.displayLinear(GL_QUADS, 0, 4);
+
     mModelView.pop();
 }
 
 void TestModule::onFrame()
 {
-    mRotation += 0.5f;
-    if (mRotation > 180.0f) mRotation -= 360.0f;
+    mCamera.update();
 }
 
 void TestModule::loadCardImage(const char* inFile, GLuint inTexture)
@@ -106,4 +132,17 @@ void TestModule::loadCardImage(const char* inFile, GLuint inTexture)
     SDL_BlitSurface(picture, NULL, back, NULL);
     SDL_FreeSurface(picture);
     DisplayEngine::loadTexture(back, inTexture);
+}
+
+void TestModule::onMouseWheel(bool inUp, bool inDown)
+{
+    Uint8* keyState = SDL_GetKeyState(NULL);
+    if (keyState[SDLK_LSHIFT] || keyState[SDLK_RSHIFT])
+    {
+        mCamera.rise(inUp ? 5.0f : -5.0f);
+    }
+    else
+    {
+        mCamera.zoom(inUp ? -2.0f : 2.0f);
+    }
 }

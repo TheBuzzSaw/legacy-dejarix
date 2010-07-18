@@ -19,7 +19,7 @@
 #define CAMERA_H
 
 #include "Matrix3D.h"
-#include "Vector2D.h"
+#include "Vector3D.h"
 
 class Camera
 {
@@ -28,6 +28,8 @@ class Camera
         ~Camera();
 
         void update();
+        void spin(float inOffset);
+        void rise(float inOffset);
         void zoom(float inOffset);
 
         inline const Matrix3D& matrix()
@@ -37,8 +39,8 @@ class Camera
 
     private:
         Matrix3D mMatrix;
-        Point mFocus;
-        float mZoom;
+        Vector3D<float> mFocus;
+        Vector3D<float> mTrackball;
 };
 
 #endif

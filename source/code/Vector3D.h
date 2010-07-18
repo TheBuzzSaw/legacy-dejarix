@@ -83,6 +83,11 @@ class Vector3D
             return mVector;
         }
 
+        inline const T* array() const
+        {
+            return mVector;
+        }
+
         inline T length() const
         {
             return sqrt((mVector[0] * mVector[0]) + (mVector[1] * mVector[1])

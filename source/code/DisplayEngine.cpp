@@ -60,7 +60,7 @@ void DisplayEngine::start(Module* inModule)
 
     list<Module*> moduleStack;
 
-    unsigned nextFrame = SDL_GetTicks() + FRAME_LENGTH;
+    Uint32 nextFrame = SDL_GetTicks() + FRAME_LENGTH;
     SDL_Event event;
 
     while (currentModule != NULL || moduleStack.size() > 0)
