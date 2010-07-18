@@ -31,7 +31,7 @@ void Camera::update()
     mMatrix.loadIdentity();
     mMatrix.translate(0.0f, 0.0f, -mTrackball[2]);
     mMatrix.rotateX(mTrackball[0]);
-    mMatrix.rotateY(mTrackball[1]);
+    mMatrix.rotateZ(mTrackball[1]);
     mMatrix.translate(-mFocus[0], -mFocus[1], -mFocus[2]);
 }
 

@@ -1,7 +1,7 @@
 display width = 1280
 display height = 720
 full screen = 0
-mipmapping = 0
+mipmapping = 1
 shader = 1
 bits per pixel = 24
 SDL_GL_RED_SIZE = -1

@@ -20,6 +20,7 @@
 #include "DisplayEngine.h"
 
 #include <iostream>
+#include <iomanip>
 using namespace std;
 
 TestModule::TestModule()
@@ -63,6 +64,9 @@ void TestModule::onLoad()
     mTable.loadVAA(mCardProgram.getBinding("CardTextureCoordinate"), 2, 4,
         tableTextures);
 
+    mMouseMode = NONE;
+
+    glGetIntegerv(GL_VIEWPORT, mViewport.array());
     mProjection.perspective(30.0f, DisplayEngine::getAspectRatio(), 1.0f,
         1000.0f);
     mModelView.reset();
@@ -98,9 +102,10 @@ void TestModule::onLoop()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     mModelView.push();
     mModelView.matrix().multiply(mCamera.matrix());
+    mMV = mModelView.matrix();
 
     mModelView.push();
-    mModelView.matrix().translate(0.0f, 0.0f, 0.25f);
+    mModelView.matrix().translate(mCardTranslate[0], mCardTranslate[1], 0.25f);
     (mMVPM = mProjection).multiply(mModelView.matrix());
     mCardProgram.setMatrix(mMVPM);
     mCard.display(mTextures[1], mTextures[2]);
@@ -119,6 +124,7 @@ void TestModule::onLoop()
 
 void TestModule::onFrame()
 {
+    mCamera.spin(0.5f);
     mCamera.update();
 }
 
@@ -144,5 +150,49 @@ void TestModule::onMouseWheel(bool inUp, bool inDown)
     else
     {
         mCamera.zoom(inUp ? -2.0f : 2.0f);
+    }
+}
+
+void TestModule::onLButtonDown(int inX, int inY)
+{
+    mMouseMode = DRAGGING;
+    mDragAnchor = mPointer;
+    mCardDragSource = mCardTranslate;
+}
+
+void TestModule::onLButtonUp(int inX, int inY)
+{
+    mMouseMode = NONE;
+}
+
+void TestModule::onMouseMove(int inX, int inY, int inRelX, int inRelY,
+    bool inLeft, bool inRight, bool inMiddle)
+{
+    int fixedY = SDL_GetVideoSurface()->h - inY;
+    GLfloat depthZ;
+    glReadPixels(inX, fixedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depthZ);
+
+    GLdouble* a = mPointer.array();
+
+    GLdouble mv[16];
+    GLdouble p[16];
+    for (size_t i = 0; i < 16; ++i)
+    {
+        mv[i] = mMV[i];
+        p[i] = mProjection[i];
+    }
+
+    if (!gluUnProject((GLdouble)inX, (GLdouble)fixedY, depthZ, mv, p,
+        mViewport.array(), a, a + 1, a + 2))
+    {
+        cerr << "failure on gluUnProject" << endl;
+        return;
+    }
+
+    if (mMouseMode == DRAGGING)
+    {
+        Vector3D<GLdouble> difference = mPointer - mDragAnchor;
+        mCardTranslate[0] = mCardDragSource[0] + difference[0];
+        mCardTranslate[1] = mCardDragSource[1] + difference[1];
     }
 }

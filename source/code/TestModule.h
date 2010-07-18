@@ -30,6 +30,8 @@ class TestModule : public Module
         TestModule();
         virtual ~TestModule();
 
+        enum MouseModes { NONE, DRAGGING };
+
         /// module operation
         virtual void onLoad();
         virtual void onOpen();
@@ -40,6 +42,10 @@ class TestModule : public Module
 
     protected:
         virtual void onMouseWheel(bool inUp, bool inDown);
+        virtual void onMouseMove(int inX, int inY, int inRelX, int inRelY,
+            bool inLeft, bool inRight, bool inMiddle);
+        virtual void onLButtonDown(int inX, int inY);
+        virtual void onLButtonUp(int inX, int inY);
 
     private:
         void loadCardImage(const char* inFile, GLuint inTexture);
@@ -54,7 +60,13 @@ class TestModule : public Module
         ShaderVBO mTable;
         CardModel mCard;
         GLuint mTextures[3];
-        float mRotation;
+        Vector3D<GLdouble> mPointer;
+        Vector3D<GLdouble> mDragAnchor;
+        Vector3D<GLfloat> mCardDragSource;
+        Vector3D<GLfloat> mCardTranslate;
+        Vector3D<GLint> mViewport;
+        Matrix3D mMV;
+        MouseModes mMouseMode;
 };
 
 #endif

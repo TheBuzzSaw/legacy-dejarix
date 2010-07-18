@@ -275,11 +275,11 @@ void DisplayEngine::initialize()
     mMask.alpha = 0xff000000;
 #endif
 
-
     Uint32 flags = SDL_OPENGL;
 
     if (Config::get<int>("full screen", 0) == 1) flags |= SDL_FULLSCREEN;
 
+    SDL_WM_SetCaption("Dejarix version 0.0.1", "Dejarix");
     mDisplay = SDL_SetVideoMode(width, height,
         Config::get<int>("bits per pixel", 24), flags);
 
@@ -362,8 +362,6 @@ void DisplayEngine::initialize()
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     //glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-
-    SDL_WM_SetCaption("Dejarix version 0.0.1", "Dejarix");
 
     openGLDriverInfo(mLogFile);
 }
