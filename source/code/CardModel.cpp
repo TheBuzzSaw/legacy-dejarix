@@ -21,9 +21,9 @@ void CardModel::display(GLuint inFront, GLuint inBack)
     glUniform4fv(mCardColor, 1, c.array());
     glUniform1i(mUseTexture, 1);
     glBindTexture(GL_TEXTURE_2D, inFront);
-    //mVertices.displayIndexed(mIndices[0]);
+    mVertices.displayIndexed(mIndices[0]);
     glBindTexture(GL_TEXTURE_2D, inBack);
-    //mVertices.displayIndexed(mIndices[2]);
+    mVertices.displayIndexed(mIndices[2]);
 
     glUniform1i(mUseTexture, 0);
     mVertices.displayIndexed(mIndices[1]);

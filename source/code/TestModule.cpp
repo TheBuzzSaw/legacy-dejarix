@@ -83,6 +83,7 @@ void TestModule::onLoop()
     mModelView.push();
     mModelView.matrix().rotateY(mRotation);
     mModelView.matrix().scale(1.0f, 1.0f, 10.0f);
+    //mModelView.matrix().scale(5.0f);
     (mMVPM = mProjection).multiply(mModelView.matrix());
     mCardProgram.setMatrix(mMVPM);
     mCard.display(mTextures[0], mTextures[1]);
