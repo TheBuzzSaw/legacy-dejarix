@@ -94,7 +94,8 @@ Shader::Shader(const char* inFile) : mHandle(0)
         GLchar log[2048];
         GLsizei length;
         glGetShaderInfoLog(mHandle, 2048, &length, log);
-        string s("compiler errors\n");
+        string s(inFile);
+        s += " -- compiler errors\n";
         s += log;
         throw Exception(s);
     }

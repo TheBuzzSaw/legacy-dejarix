@@ -1,5 +1,8 @@
 #include "CardModel.h"
 
+#include <fstream>
+using namespace std;
+
 GLint CardModel::mCardTexture = 0;
 GLint CardModel::mUseTexture = 0;
 GLint CardModel::mCardColor = 0;
@@ -18,9 +21,9 @@ void CardModel::display(GLuint inFront, GLuint inBack)
     glUniform4fv(mCardColor, 1, c.array());
     glUniform1i(mUseTexture, 1);
     glBindTexture(GL_TEXTURE_2D, inFront);
-    mVertices.displayIndexed(mIndices[0]);
+    //mVertices.displayIndexed(mIndices[0]);
     glBindTexture(GL_TEXTURE_2D, inBack);
-    mVertices.displayIndexed(mIndices[2]);
+    //mVertices.displayIndexed(mIndices[2]);
 
     glUniform1i(mUseTexture, 0);
     mVertices.displayIndexed(mIndices[1]);
@@ -43,7 +46,6 @@ void CardModel::build(const ShaderProgram& inProgram)
 
     GLfloat* vertices = NULL;
     GLfloat* textureCoordinates = NULL;
-    GLuint* indices = NULL;
     GLuint* topIndices = NULL;
     GLuint* middleIndices = NULL;
     GLuint* bottomIndices = NULL;
@@ -153,10 +155,21 @@ textureCoordinates[currentTC++] = (y)
     mVertices.loadVAA(inProgram.getBinding("CardTextureCoordinate"), 2,
         numVertices, textureCoordinates);
 
+    ofstream fout("card.txt");
+    for (int i = 0; i < numVertices; ++i)
+    {
+        fout << "v " << vertices[i * 3] << ' ' << vertices[i * 3 + 1] << ' '
+            << vertices[i * 3 + 2];
+        fout << " tc " << textureCoordinates[i * 2] << ' '
+            << textureCoordinates[i * 2 + 1] << endl;
+    }
+
+    delete [] vertices;
+    delete [] textureCoordinates;
+
     int numTriangles = 16 * mDetail + 28;
     int numMiddleTriangles = 8 * mDetail + 8;
     int numTopTriangles = (numTriangles - numMiddleTriangles) / 2;
-    indices = new GLuint[numTriangles * 3];
 
     topIndices = new GLuint[numTopTriangles * 3];
     middleIndices = new GLuint[numMiddleTriangles * 3];
@@ -206,4 +219,30 @@ bottomIndices[bottomCurrent++] = (a) + 1
     mIndices[0].loadData(numTopTriangles * 3, topIndices);
     mIndices[1].loadData(numMiddleTriangles * 3, middleIndices);
     mIndices[2].loadData(numTopTriangles * 3, bottomIndices);
+
+    fout << "\ntop indices\n";
+    for (int i = 0; i < numTopTriangles; ++i)
+    {
+        fout << topIndices[i * 3] << ' ' << topIndices[i * 3 + 1]
+            << ' ' << topIndices[i * 3 + 2] << endl;
+    }
+
+    fout << "\nmiddle indices\n";
+    for (int i = 0; i < numMiddleTriangles; ++i)
+    {
+        fout << middleIndices[i * 3] << ' ' << middleIndices[i * 3 + 1]
+            << ' ' << middleIndices[i * 3 + 2] << endl;
+    }
+
+    fout << "\nbottom indices\n";
+    for (int i = 0; i < numTopTriangles; ++i)
+    {
+        fout << bottomIndices[i * 3] << ' ' << bottomIndices[i * 3 + 1]
+            << ' ' << bottomIndices[i * 3 + 2] << endl;
+    }
+    fout.close();
+
+    delete [] topIndices;
+    delete [] middleIndices;
+    delete [] bottomIndices;
 }
