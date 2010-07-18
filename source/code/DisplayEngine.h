@@ -64,12 +64,6 @@ class DisplayEngine
 
         static int processKey(SDLKey inSym, SDLMod inMod);
 
-        static Surface mDisplay;
-        static unsigned int mFPS;
-
-        static bool printErrors(const char* inMessage,
-            std::ostream& inStream = mLogFile);
-
         static inline const std::string& getShaderFolder()
         {
             return mShaderFolder;
@@ -78,11 +72,6 @@ class DisplayEngine
         static inline float getAspectRatio()
         {
             return mAspectRatio;
-        }
-
-        static inline int getDisplayHeight()
-        {
-            return mDisplay->h;
         }
 
         static inline void render();

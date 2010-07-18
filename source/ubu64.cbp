@@ -37,7 +37,6 @@
 		</Compiler>
 		<Linker>
 			<Add library="GL" />
-			<Add library="GLU" />
 			<Add library="SDLmain" />
 			<Add library="SDL_image" />
 			<Add library="SDL_mixer" />
@@ -64,8 +63,6 @@
 		<Unit filename="code/GameServer.h" />
 		<Unit filename="code/IndexVBO.cpp" />
 		<Unit filename="code/IndexVBO.h" />
-		<Unit filename="code/LoadScreen.cpp" />
-		<Unit filename="code/LoadScreen.h" />
 		<Unit filename="code/LogFile.cpp" />
 		<Unit filename="code/LogFile.h" />
 		<Unit filename="code/LuaMachine.cpp" />

@@ -38,12 +38,10 @@
 #include <sstream>
 using namespace std;
 
-Surface DisplayEngine::mDisplay = NULL;
 Surface DisplayEngine::mWindowIcon = NULL;
 SDL_Rect** DisplayEngine::mModes = NULL;
 int DisplayEngine::mMipmapping = 0;
 ColorMask DisplayEngine::mMask;
-unsigned int DisplayEngine::mFPS = 0;
 string DisplayEngine::mShaderFolder("data/shaders/");
 float DisplayEngine::mAspectRatio;
 LogFile DisplayEngine::mLogFile;
@@ -97,7 +95,6 @@ void DisplayEngine::start(Module* inModule)
 
         unsigned int nextSecond = SDL_GetTicks() + 1000u;
         int framesPerSecond = 0;
-        mFPS = 0; //setup the frames per second
 
         while (currentModule->isRunning())
         {
@@ -110,7 +107,6 @@ void DisplayEngine::start(Module* inModule)
                 nextSecond += 1000u;
 
                 //store the # of frames printed this second
-                mFPS = framesPerSecond;
                 framesPerSecond = 0;
             }
 
@@ -280,8 +276,8 @@ void DisplayEngine::initialize()
     if (Config::get<int>("full screen", 0) == 1) flags |= SDL_FULLSCREEN;
 
     SDL_WM_SetCaption("Dejarix version 0.0.1", "Dejarix");
-    mDisplay = SDL_SetVideoMode(width, height,
-        Config::get<int>("bits per pixel", 24), flags);
+    SDL_SetVideoMode(width, height, Config::get<int>("bits per pixel", 24),
+        flags);
 
 
     logStream << endl << "current SDL OpenGL settings" << endl << endl;
@@ -396,35 +392,9 @@ Surface DisplayEngine::loadImage(const char* inFile)
     return outSurface;
 }
 
-bool DisplayEngine::printErrors(const char* inMessage, ostream& inStream)
-{
-    GLenum error;
-    bool isError = false;
-
-    error = glGetError();
-
-    //gluErrorString(error) ?
-
-    if (error != GL_NO_ERROR)
-    {
-        inStream << inMessage;
-        isError = true;
-    }
-
-    while (error != GL_NO_ERROR)
-    {
-        inStream << gluErrorString(error) << endl;
-        error = glGetError();
-    }
-    return isError;
-}
-
 bool DisplayEngine::loadTexture(Surface inSurface, GLuint inTexture,
     bool inDelete)
 {
-
-    printErrors("Pre-texture errors:\n", mLogFile);
-
     bool outSuccess = true;
     if (inSurface == NULL)
     {
@@ -486,11 +456,6 @@ bool DisplayEngine::loadTexture(Surface inSurface, GLuint inTexture,
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
             GL_LINEAR_MIPMAP_LINEAR);
     }
-
-    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    printErrors("Post-texture errors:\n", mLogFile);
-
 
     if (!outSuccess || inDelete) SDL_FreeSurface(inSurface);
     return outSuccess;

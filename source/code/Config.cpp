@@ -51,13 +51,11 @@ void Config::initialize(int inArgc, char** inArgv)
         // UNIX home folder settings file
         using namespace boost::filesystem;
         string s(UNIX_HOME_FOLDER);
-        s += "/.cyborus";
-        create_directory(s.c_str());
-        s += "/zero2d";
+        s += "/.dejarix";
         create_directory(s.c_str());
         s += "/logs";
         create_directory(s.c_str());
-        mUserFolder += "/.cyborus/zero2d/";
+        mUserFolder += "/.dejarix/";
     }
 #endif
 

@@ -69,8 +69,10 @@ void TestModule::onLoad()
     glGetIntegerv(GL_VIEWPORT, mViewport.array());
     mProjection.perspective(30.0f, DisplayEngine::getAspectRatio(), 1.0f,
         1000.0f);
+    for (size_t i = 0; i < 16; ++i) mProjectionArray[i] = mProjection[i];
     mModelView.reset();
     mCamera.zoom(18.0f);
+    mSpin = false;
 }
 
 void TestModule::onUnload()
@@ -102,7 +104,6 @@ void TestModule::onLoop()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     mModelView.push();
     mModelView.matrix().multiply(mCamera.matrix());
-    mMV = mModelView.matrix();
 
     mModelView.push();
     mModelView.matrix().translate(mCardTranslate[0], mCardTranslate[1], 0.25f);
@@ -124,8 +125,9 @@ void TestModule::onLoop()
 
 void TestModule::onFrame()
 {
-    mCamera.spin(0.5f);
+    if (mSpin) mCamera.spin(0.5f);
     mCamera.update();
+    if (mMouseMode == DRAGGING) processPosition();
 }
 
 void TestModule::loadCardImage(const char* inFile, GLuint inTexture)
@@ -168,22 +170,20 @@ void TestModule::onLButtonUp(int inX, int inY)
 void TestModule::onMouseMove(int inX, int inY, int inRelX, int inRelY,
     bool inLeft, bool inRight, bool inMiddle)
 {
-    int fixedY = SDL_GetVideoSurface()->h - inY;
+    mMouseCoordinates[0] = inX;
+    mMouseCoordinates[1] = inY;
+    processPosition();
+}
+
+void TestModule::processPosition()
+{
+    int fixedY = SDL_GetVideoSurface()->h - mMouseCoordinates[1];
     GLfloat depthZ;
-    glReadPixels(inX, fixedY, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &depthZ);
+    glReadPixels(mMouseCoordinates[0], fixedY, 1, 1, GL_DEPTH_COMPONENT,
+        GL_FLOAT, &depthZ);
 
-    GLdouble* a = mPointer.array();
-
-    GLdouble mv[16];
-    GLdouble p[16];
-    for (size_t i = 0; i < 16; ++i)
-    {
-        mv[i] = mMV[i];
-        p[i] = mProjection[i];
-    }
-
-    if (!gluUnProject((GLdouble)inX, (GLdouble)fixedY, depthZ, mv, p,
-        mViewport.array(), a, a + 1, a + 2))
+    if (!unproject((float)mMouseCoordinates[0], (float)fixedY, depthZ,
+        mCamera.matrix(), mProjection, mViewport, mPointer))
     {
         cerr << "failure on gluUnProject" << endl;
         return;
@@ -191,8 +191,67 @@ void TestModule::onMouseMove(int inX, int inY, int inRelX, int inRelY,
 
     if (mMouseMode == DRAGGING)
     {
-        Vector3D<GLdouble> difference = mPointer - mDragAnchor;
+        Vector3D<GLfloat> difference = mPointer - mDragAnchor;
         mCardTranslate[0] = mCardDragSource[0] + difference[0];
         mCardTranslate[1] = mCardDragSource[1] + difference[1];
     }
+}
+
+void TestModule::onKeyDown(SDLKey inSym, SDLMod inMod, Uint16 inUnicode)
+{
+    switch (inSym)
+    {
+        case SDLK_ESCAPE:
+        {
+            mRunning = false;
+            break;
+        }
+
+        case SDLK_SPACE:
+        {
+            mSpin = !mSpin;
+            break;
+        }
+
+        default:
+        {
+        }
+    }
+}
+
+bool TestModule::unproject(float inX, float inY, float inZ,
+    const Matrix3D& inMVM, const Matrix3D& inPM,
+    const Vector3D<int>& inViewport, Vector3D<float>& inResult)
+{
+    Vector3D<float> in;
+
+    in[0] = (inX - inViewport[0]) * 2.0f / inViewport[2] - 1.0f;
+    in[1] = (inY - inViewport[1]) * 2.0f / inViewport[3] - 1.0f;
+    in[2] = 2 * inZ - 1.0f;
+    in[3] = 1.0f;
+
+    Matrix3D a(inPM);
+    a.multiply(inMVM);
+    Matrix3D m;
+    a.inverse(m);
+    transformPoint(m, in, inResult);
+    if (inResult[3] == 0.0f) return false;
+    inResult[0] /= inResult[3];
+    inResult[1] /= inResult[3];
+    inResult[2] /= inResult[3];
+    inResult[3] = 1.0f;
+    return true;
+}
+
+void TestModule::transformPoint(const Matrix3D& inMatrix,
+    const Vector3D<float>& inVector, Vector3D<float>& inResult)
+{
+    inResult[0] = inMatrix(0, 0) * inVector[0] + inMatrix(0, 1) * inVector[1]
+        + inMatrix(0, 2) * inVector[2] + inMatrix(0, 3) * inVector[3];
+    inResult[1] = inMatrix(1, 0) * inVector[0] + inMatrix(1, 1) * inVector[1]
+        + inMatrix(1, 2) * inVector[2] + inMatrix(1, 3) * inVector[3];
+    inResult[2] = inMatrix(2, 0) * inVector[0] + inMatrix(2, 1) * inVector[1]
+        + inMatrix(2, 2) * inVector[2] + inMatrix(2, 3) * inVector[3];
+    inResult[3] = inMatrix(3, 0) * inVector[0] + inMatrix(3, 1) * inVector[1]
+        + inMatrix(3, 2) * inVector[2] + inMatrix(3, 3) * inVector[3];
 }

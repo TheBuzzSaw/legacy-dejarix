@@ -23,6 +23,7 @@
 #include "CardModel.h"
 #include "MatrixStack.h"
 #include "Camera.h"
+#include "Vector2D.h"
 
 class TestModule : public Module
 {
@@ -41,6 +42,13 @@ class TestModule : public Module
         virtual void onUnload();
 
     protected:
+        static bool unproject(float inX, float inY, float inZ,
+            const Matrix3D& inMVM, const Matrix3D& inPM,
+            const Vector3D<int>& inViewport, Vector3D<float>& inResult);
+        static void transformPoint(const Matrix3D& inMatrix,
+            const Vector3D<float>& inVector, Vector3D<float>& inResult);
+
+        virtual void onKeyDown(SDLKey inSym, SDLMod inMod, Uint16 inUnicode);
         virtual void onMouseWheel(bool inUp, bool inDown);
         virtual void onMouseMove(int inX, int inY, int inRelX, int inRelY,
             bool inLeft, bool inRight, bool inMiddle);
@@ -49,10 +57,12 @@ class TestModule : public Module
 
     private:
         void loadCardImage(const char* inFile, GLuint inTexture);
+        void processPosition();
 
         Camera mCamera;
         MatrixStack mModelView;
         Matrix3D mProjection;
+        GLdouble mProjectionArray[16];
         Matrix3D mMVPM;
         ShaderProgram mCardProgram;
         GLint mUniformUseTexture;
@@ -60,13 +70,14 @@ class TestModule : public Module
         ShaderVBO mTable;
         CardModel mCard;
         GLuint mTextures[3];
-        Vector3D<GLdouble> mPointer;
-        Vector3D<GLdouble> mDragAnchor;
+        Pixel mMouseCoordinates;
+        Vector3D<GLfloat> mPointer;
+        Vector3D<GLfloat> mDragAnchor;
         Vector3D<GLfloat> mCardDragSource;
         Vector3D<GLfloat> mCardTranslate;
         Vector3D<GLint> mViewport;
-        Matrix3D mMV;
         MouseModes mMouseMode;
+        bool mSpin;
 };
 
 #endif
