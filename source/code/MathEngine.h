@@ -38,6 +38,12 @@ class MathEngine
             return outValue();
         }
 
+        template<class T>
+        static inline T absolute(T inValue)
+        {
+            return inValue < 0 ? -inValue : inValue;
+        }
+
     private:
         static boost::mt19937 mSeed;
 };

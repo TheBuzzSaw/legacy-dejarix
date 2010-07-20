@@ -20,6 +20,7 @@
 
 #include "Matrix3D.h"
 #include "Vector3D.h"
+#include "Vector2D.h"
 
 class Camera
 {
@@ -31,6 +32,7 @@ class Camera
         void spin(float inOffset);
         void rise(float inOffset);
         void zoom(float inOffset);
+        void move(Point inRelative);
 
         inline const Matrix3D& matrix()
         {

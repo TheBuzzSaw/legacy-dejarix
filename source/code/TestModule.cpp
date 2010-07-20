@@ -48,6 +48,9 @@ void TestModule::loadCardImage(const char* inFile, GLuint inTexture)
 
 void TestModule::onLoad()
 {
+    mWindowCenter[0] = SDL_GetVideoSurface()->w / 2;
+    mWindowCenter[1] = SDL_GetVideoSurface()->h / 2;
+
     glGenTextures(NUM_TEXTURES, mTextures);
     DisplayEngine::loadTexture("data/images/wood.jpg", mTextures[0]);
 
@@ -74,7 +77,7 @@ void TestModule::onLoad()
         cardFile += s.substr(t + 3);
         cardFile += ".gif";
 
-        cerr << cardFile << endl;
+        //cerr << cardFile << endl;
 
         loadCardImage(cardFile.c_str(), mTextures[targetTexture]);
         ++targetTexture;
@@ -161,21 +164,31 @@ void TestModule::onLoop()
 
 void TestModule::onFrame()
 {
+    Pixel relative;
+    relative[0] = mMouseCoordinates[0] - mWindowCenter[0];
+    relative[1] = mWindowCenter[1] - mMouseCoordinates[1];
+
+    Point toMove;
+    toMove[0] = float(relative[0]) / float(mWindowCenter[0]);
+    toMove[1] = float(relative[1]) / float(mWindowCenter[1]);
+
+    mCamera.move(toMove);
     if (mSpin) mCamera.spin(0.5f);
     mCamera.update();
     processPosition();
 
     float w = 6.3f / 2.0f;
     float h = 8.8f / 2.0f;
-    if (mPointer[0] >= mCardTranslate[0] - w
+    if (mMouseMode == DRAGGING)
+    {
+        mCardColor.set(0.2f, 0.2f, 0.4f);
+    }
+    else if (mPointer[0] >= mCardTranslate[0] - w
         && mPointer[0] <= mCardTranslate[0] + w
         && mPointer[1] >= mCardTranslate[1] - h
         && mPointer[1] <= mCardTranslate[1] + h)
     {
-        if (mMouseMode == NONE)
-            mCardColor.set(0.2f, 0.2f, 0.2f);
-        else if (mMouseMode == DRAGGING)
-            mCardColor.set(0.2f, 0.2f, 0.4f);
+        mCardColor.set(0.2f, 0.2f, 0.2f);
     }
     else
     {
@@ -212,6 +225,15 @@ void TestModule::onLButtonDown(int inX, int inY)
 void TestModule::onLButtonUp(int inX, int inY)
 {
     mMouseMode = NONE;
+}
+
+void TestModule::onRButtonDown(int inX, int inY)
+{
+    if (mMouseMode == DRAGGING)
+    {
+        mMouseMode = NONE;
+        mCardTranslate = mCardDragSource;
+    }
 }
 
 void TestModule::onMouseMove(int inX, int inY, int inRelX, int inRelY,

@@ -56,6 +56,7 @@ class TestModule : public Module
             bool inLeft, bool inRight, bool inMiddle);
         virtual void onLButtonDown(int inX, int inY);
         virtual void onLButtonUp(int inX, int inY);
+        virtual void onRButtonDown(int inX, int inY);
 
     private:
         void loadCardImage(const char* inFile, GLuint inTexture);
@@ -71,6 +72,7 @@ class TestModule : public Module
         CardModel mCard;
         GLuint mTextures[NUM_TEXTURES];
         Pixel mMouseCoordinates;
+        Pixel mWindowCenter;
         Vector3D<GLfloat> mPointer;
         Vector3D<GLfloat> mDragAnchor;
         Vector3D<GLfloat> mCardDragSource;

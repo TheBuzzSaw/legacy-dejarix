@@ -18,6 +18,8 @@
 #include "Camera.h"
 #include "OGL.h"
 
+#include <cmath>
+
 Camera::Camera()
 {
 }
@@ -57,4 +59,36 @@ void Camera::zoom(float inOffset)
 {
     mTrackball[2] += inOffset;
     if (mTrackball[2] < 0.0f) mTrackball[2] = 0.0f;
+}
+
+void Camera::move(Point inRelative)
+{
+    for (size_t i = 0; i < 2; ++i)
+    {
+        bool neg = inRelative[i] < 0.0f;
+        inRelative[i] = fabs(inRelative[i]);
+
+        if (inRelative[i] < 0.5f)
+        {
+            inRelative[i] = 0.0f;
+            continue;
+        }
+        else
+        {
+            inRelative[i] -= 0.5f;
+            inRelative[i] += 1.0f;
+            inRelative[i] = pow(inRelative[i], 3.0f);
+            inRelative[i] -= 1.0f;
+        }
+
+        if (neg) inRelative[i] = -inRelative[i];
+        inRelative[i] *= 0.015f * mTrackball[2];
+    }
+
+    float r = TO_RADIANS(mTrackball[1]);
+    float s = sin(r);
+    float c = cos(r);
+
+    mFocus[0] += c * inRelative[0] + s * inRelative[1];
+    mFocus[1] += -s * inRelative[0] + c * inRelative[1];
 }
