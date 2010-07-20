@@ -19,11 +19,13 @@
 #define TESTMODULE_H
 
 #include "Module.h"
-#include "ShaderProgram.h"
+#include "CardProgram.h"
 #include "CardModel.h"
 #include "MatrixStack.h"
 #include "Camera.h"
 #include "Vector2D.h"
+
+#define NUM_TEXTURES 61
 
 class TestModule : public Module
 {
@@ -64,20 +66,21 @@ class TestModule : public Module
         Matrix3D mProjection;
         GLdouble mProjectionArray[16];
         Matrix3D mMVPM;
-        ShaderProgram mCardProgram;
-        GLint mUniformUseTexture;
-        GLint mUniformCardColor;
+        CardProgram mCardProgram;
         ShaderVBO mTable;
         CardModel mCard;
-        GLuint mTextures[3];
+        GLuint mTextures[NUM_TEXTURES];
         Pixel mMouseCoordinates;
         Vector3D<GLfloat> mPointer;
         Vector3D<GLfloat> mDragAnchor;
         Vector3D<GLfloat> mCardDragSource;
         Vector3D<GLfloat> mCardTranslate;
+        Vector3D<GLfloat> mCardColor;
         Vector3D<GLint> mViewport;
         MouseModes mMouseMode;
         bool mSpin;
+        size_t mCurrentTexture;
+        Uint8* mKeyState;
 };
 
 #endif

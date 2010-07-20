@@ -382,7 +382,7 @@ Surface DisplayEngine::loadImage(const char* inFile)
 
     if (t == NULL)
     {
-        //cerr << "failed to load image: " << inFile << endl;
+        cerr << "failed to load image: " << inFile << endl;
         return NULL;
     }
 

@@ -20,10 +20,13 @@
 #include "DisplayEngine.h"
 
 #include <iostream>
+#include <fstream>
 #include <iomanip>
+#include <sstream>
+#include <string>
 using namespace std;
 
-TestModule::TestModule()
+TestModule::TestModule() : mCard(mCardProgram)
 {
 }
 
@@ -31,24 +34,53 @@ TestModule::~TestModule()
 {
 }
 
+void TestModule::loadCardImage(const char* inFile, GLuint inTexture)
+{
+    string s("data/images/");
+    s += inFile;
+    Surface back = DisplayEngine::blankSurface(512, 512);
+
+    Surface picture = DisplayEngine::loadImage(s.c_str());
+    SDL_BlitSurface(picture, NULL, back, NULL);
+    SDL_FreeSurface(picture);
+    DisplayEngine::loadTexture(back, inTexture);
+}
+
 void TestModule::onLoad()
 {
-    glGenTextures(2, mTextures);
+    glGenTextures(NUM_TEXTURES, mTextures);
     DisplayEngine::loadTexture("data/images/wood.jpg", mTextures[0]);
-    loadCardImage("localuprising.gif", mTextures[1]);
-    loadCardImage("liberation.gif", mTextures[2]);
 
+    ifstream fin("data/decks/ds2dark.htd");
+    if (fin.fail())
+        throw Module::Exception("failed to open dark deck");
 
-    mCardProgram.attachShader("card.vs");
-    mCardProgram.attachShader("card.fs");
-    mCardProgram.addVariable("CardVertex");
-    mCardProgram.addVariable("CardTextureCoordinate");
-    mCardProgram.bindAndLink();
-    mUniformUseTexture = mCardProgram.getUniformLocation("UseTexture");
-    mUniformCardColor = mCardProgram.getUniformLocation("CardColor");
-    CardModel::setUniforms(mCardProgram.getUniformLocation("CardTexture"),
-        mUniformUseTexture, mUniformCardColor);
-    mCard.build(mCardProgram);
+    string oneLine;
+    size_t targetTexture = 1;
+    while (getline(fin, oneLine))
+    {
+        if (oneLine.substr(0, 4) != "card") continue;
+
+        stringstream ss;
+        ss << oneLine;
+        string s;
+
+        ss >> s >> s;
+        s = s.substr(1, s.length() - 2);
+        size_t t = s.find_last_of('/');
+        string cardFile("cards/");
+        cardFile += s.substr(1, t - 1);
+        cardFile += "/large/";
+        cardFile += s.substr(t + 3);
+        cardFile += ".gif";
+
+        cerr << cardFile << endl;
+
+        loadCardImage(cardFile.c_str(), mTextures[targetTexture]);
+        ++targetTexture;
+    }
+
+    fin.close();
 
     GLfloat tableVertices[12] = {
         100.0f, 100.0f, 0.0f,
@@ -60,9 +92,8 @@ void TestModule::onLoad()
         0.0f, 0.0f, 20.0f, 0.0f,
         20.0f, 20.0f, 0.0f, 20.0f};
 
-    mTable.loadVAA(mCardProgram.getBinding("CardVertex"), 3, 4, tableVertices);
-    mTable.loadVAA(mCardProgram.getBinding("CardTextureCoordinate"), 2, 4,
-        tableTextures);
+    mTable.loadVAA(CardProgram::VERTEX, 3, 4, tableVertices);
+    mTable.loadVAA(CardProgram::TEXTURE, 2, 4, tableTextures);
 
     mMouseMode = NONE;
 
@@ -73,11 +104,13 @@ void TestModule::onLoad()
     mModelView.reset();
     mCamera.zoom(18.0f);
     mSpin = false;
+    mKeyState = SDL_GetKeyState(NULL);
+    mCurrentTexture = 1;
 }
 
 void TestModule::onUnload()
 {
-    glDeleteTextures(3, mTextures);
+    glDeleteTextures(NUM_TEXTURES, mTextures);
 }
 
 void TestModule::onOpen()
@@ -107,14 +140,17 @@ void TestModule::onLoop()
 
     mModelView.push();
     mModelView.matrix().translate(mCardTranslate[0], mCardTranslate[1], 0.25f);
+    //mModelView.matrix().scale(1.0f, 1.0f, 10.0f);
     (mMVPM = mProjection).multiply(mModelView.matrix());
     mCardProgram.setMatrix(mMVPM);
-    mCard.display(mTextures[1], mTextures[2]);
+    //mCardProgram.setColor(Vector3D<float>(0.5f, 0.0f, 0.0f, 0.5f));
+    mCardProgram.setColor(mCardColor);
+    mCard.display(mTextures[mCurrentTexture], mTextures[mCurrentTexture]);
     mModelView.pop();
 
     static const Vector3D<float> tableColor(0.0f);
-    glUniform1i(mUniformUseTexture, 1);
-    glUniform4fv(mUniformCardColor, 1, tableColor.array());
+    mCardProgram.useTexture(true);
+    mCardProgram.setColor(tableColor);
     (mMVPM = mProjection).multiply(mModelView.matrix());
     mCardProgram.setMatrix(mMVPM);
     glBindTexture(GL_TEXTURE_2D, mTextures[0]);
@@ -127,25 +163,36 @@ void TestModule::onFrame()
 {
     if (mSpin) mCamera.spin(0.5f);
     mCamera.update();
-    if (mMouseMode == DRAGGING) processPosition();
-}
+    processPosition();
 
-void TestModule::loadCardImage(const char* inFile, GLuint inTexture)
-{
-    string s("data/images/");
-    s += inFile;
-    Surface back = DisplayEngine::blankSurface(512, 512);
+    float w = 6.3f / 2.0f;
+    float h = 8.8f / 2.0f;
+    if (mPointer[0] >= mCardTranslate[0] - w
+        && mPointer[0] <= mCardTranslate[0] + w
+        && mPointer[1] >= mCardTranslate[1] - h
+        && mPointer[1] <= mCardTranslate[1] + h)
+    {
+        if (mMouseMode == NONE)
+            mCardColor.set(0.2f, 0.2f, 0.2f);
+        else if (mMouseMode == DRAGGING)
+            mCardColor.set(0.2f, 0.2f, 0.4f);
+    }
+    else
+    {
+        mCardColor.set(0.0f);
+    }
 
-    Surface picture = DisplayEngine::loadImage(s.c_str());
-    SDL_BlitSurface(picture, NULL, back, NULL);
-    SDL_FreeSurface(picture);
-    DisplayEngine::loadTexture(back, inTexture);
+    if (mMouseMode == DRAGGING)
+    {
+        Vector3D<GLfloat> difference = mPointer - mDragAnchor;
+        mCardTranslate[0] = mCardDragSource[0] + difference[0];
+        mCardTranslate[1] = mCardDragSource[1] + difference[1];
+    }
 }
 
 void TestModule::onMouseWheel(bool inUp, bool inDown)
 {
-    Uint8* keyState = SDL_GetKeyState(NULL);
-    if (keyState[SDLK_LSHIFT] || keyState[SDLK_RSHIFT])
+    if (mKeyState[SDLK_LSHIFT] || mKeyState[SDLK_RSHIFT])
     {
         mCamera.rise(inUp ? 5.0f : -5.0f);
     }
@@ -188,13 +235,6 @@ void TestModule::processPosition()
         cerr << "failure on gluUnProject" << endl;
         return;
     }
-
-    if (mMouseMode == DRAGGING)
-    {
-        Vector3D<GLfloat> difference = mPointer - mDragAnchor;
-        mCardTranslate[0] = mCardDragSource[0] + difference[0];
-        mCardTranslate[1] = mCardDragSource[1] + difference[1];
-    }
 }
 
 void TestModule::onKeyDown(SDLKey inSym, SDLMod inMod, Uint16 inUnicode)
@@ -210,6 +250,22 @@ void TestModule::onKeyDown(SDLKey inSym, SDLMod inMod, Uint16 inUnicode)
         case SDLK_SPACE:
         {
             mSpin = !mSpin;
+            break;
+        }
+
+        case SDLK_PLUS:
+        case SDLK_KP_PLUS:
+        {
+            ++mCurrentTexture;
+            if (mCurrentTexture >= NUM_TEXTURES) mCurrentTexture = 1;
+            break;
+        }
+
+        case SDLK_MINUS:
+        case SDLK_KP_MINUS:
+        {
+            --mCurrentTexture;
+            if (mCurrentTexture < 1) mCurrentTexture = NUM_TEXTURES - 1;
             break;
         }
 

@@ -21,10 +21,13 @@
 using namespace std;
 
 ShaderProgram::ShaderProgram(size_t inCapacity) : mHandle(0),
-    mCapacity(inCapacity), mSize(0), mLink(false), mCreate(false)
+    mCapacity(inCapacity), mSize(0), mLink(false)
 {
     if (mCapacity < 2) mCapacity = 2;
     mShaders = new Shader*[mCapacity];
+    mHandle = glCreateProgram();
+    if (!mHandle)
+        throw Shader::Exception("unable to create program (glCreateProgram)");
 }
 
 ShaderProgram::~ShaderProgram()
@@ -38,17 +41,9 @@ ShaderProgram::~ShaderProgram()
 
 void ShaderProgram::attachShader(const char* inFile)
 {
-    if (inFile == NULL || mSize >= mCapacity) return;
-
-    if (!mCreate)
-    {
-        // moved out of the constructor so that exceptions are thrown at the
-        // proper times
-        mCreate = true;
-        mHandle = glCreateProgram();
-        if (!mHandle)
-            throw Shader::Exception("unable to create program (glCreateProgram)");
-    }
+    if (inFile == NULL || mSize >= mCapacity)
+        throw Shader::Exception(string("exceeded shader capacity -- ")
+            + inFile);
 
     Shader* s = Shader::load(inFile);
 
@@ -57,21 +52,11 @@ void ShaderProgram::attachShader(const char* inFile)
     ++mSize;
 }
 
-void ShaderProgram::bindAndLink()
+void ShaderProgram::linkAndBind()
 {
     // can only be bound and linked once
-    if (mLink) return;
+    if (mLink) throw Shader::Exception("shader program already linked");
     mLink = true;
-
-    GLuint topIndex = 0;
-
-    for (map<string, GLuint>::iterator i = mBindings.begin();
-        i != mBindings.end(); ++i)
-    {
-        i->second = topIndex;
-        glBindAttribLocation(mHandle, topIndex, i->first.c_str());
-        ++topIndex;
-    }
 
     glLinkProgram(mHandle);
 
@@ -84,25 +69,10 @@ void ShaderProgram::bindAndLink()
     use();
 
     mUniformMatrix = glGetUniformLocation(mHandle, "MVPM");
+    bindUniforms();
 }
 
 void ShaderProgram::setMatrix(const Matrix3D& inMatrix)
 {
     glUniformMatrix4fv(mUniformMatrix, 1, GL_FALSE, inMatrix.array());
-}
-
-GLuint ShaderProgram::getBinding(const string& inName) const
-{
-    if (!mLink) throw Shader::Exception("cannot request binding before link");
-
-    map<string, GLuint>::const_iterator i = mBindings.find(inName);
-
-    if (i == mBindings.end())
-    {
-        string s("request for non-existent binding: ");
-        s += inName;
-        throw Shader::Exception(s);
-    }
-
-    return i->second;
 }

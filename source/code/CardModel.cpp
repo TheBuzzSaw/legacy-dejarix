@@ -3,12 +3,11 @@
 #include <fstream>
 using namespace std;
 
-GLint CardModel::mCardTexture = 0;
-GLint CardModel::mUseTexture = 0;
-GLint CardModel::mCardColor = 0;
-
-CardModel::CardModel() : mSize(6.3f, 8.8f, 0.05f, 0.25f), mDetail(4)
+CardModel::CardModel(CardProgram& inProgram) : mSize(6.3f, 8.8f, 0.05f, 0.25f),
+    mDetail(4)
 {
+    mCardProgram = &inProgram;
+    build();
 }
 
 CardModel::~CardModel()
@@ -17,28 +16,17 @@ CardModel::~CardModel()
 
 void CardModel::display(GLuint inFront, GLuint inBack)
 {
-    Vector3D<float> c(0.25f);
-    glUniform4fv(mCardColor, 1, c.array());
-    glUniform1i(mUseTexture, 1);
+    mCardProgram->useTexture(true);
     glBindTexture(GL_TEXTURE_2D, inFront);
     mVertices.displayIndexed(mIndices[0]);
     glBindTexture(GL_TEXTURE_2D, inBack);
     mVertices.displayIndexed(mIndices[2]);
 
-    glUniform1i(mUseTexture, 0);
+    mCardProgram->useTexture(false);
     mVertices.displayIndexed(mIndices[1]);
 }
 
-void CardModel::setUniforms(GLint inCardTexture, GLint inUseTexture,
-    GLint inCardColor)
-{
-    mCardTexture = inCardTexture;
-    mUseTexture = inUseTexture;
-    mCardColor = inCardColor;
-    glUniform1i(mCardTexture, 0);
-}
-
-void CardModel::build(const ShaderProgram& inProgram)
+void CardModel::build()
 {
     float w = mSize[0] / 2.0f;
     float h = mSize[1] / 2.0f;
@@ -150,10 +138,8 @@ textureCoordinates[currentTC++] = (y)
         textureCoordinates[i * 2 + 1] *= HTA;
     }
 
-    mVertices.loadVAA(inProgram.getBinding("CardVertex"), 3, numVertices,
-        vertices);
-    mVertices.loadVAA(inProgram.getBinding("CardTextureCoordinate"), 2,
-        numVertices, textureCoordinates);
+    mVertices.loadVAA(CardProgram::VERTEX, 3, numVertices, vertices);
+    mVertices.loadVAA(CardProgram::TEXTURE, 2, numVertices, textureCoordinates);
 
     ofstream fout("card.txt");
     for (int i = 0; i < numVertices; ++i)

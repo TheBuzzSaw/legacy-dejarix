@@ -51,6 +51,8 @@
 		<Unit filename="code/Camera.h" />
 		<Unit filename="code/CardModel.cpp" />
 		<Unit filename="code/CardModel.h" />
+		<Unit filename="code/CardProgram.cpp" />
+		<Unit filename="code/CardProgram.h" />
 		<Unit filename="code/Config.cpp" />
 		<Unit filename="code/Config.h" />
 		<Unit filename="code/DisplayEngine.cpp" />

@@ -10,7 +10,12 @@ out vec4 gl_FragColor;
 void main()
 {
     if (UseTexture)
-        gl_FragColor = vec4(texture(CardTexture, TextureCoordinate).rgb, 1.0);
+    {
+        gl_FragColor = vec4(texture(CardTexture, TextureCoordinate).rgb, 1.0)
+            + CardColor;
+    }
     else
+    {
         gl_FragColor = CardColor;
+    }
 }
