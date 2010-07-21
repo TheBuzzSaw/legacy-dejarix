@@ -61,28 +61,16 @@ void Camera::zoom(float inOffset)
     if (mTrackball[2] < 0.0f) mTrackball[2] = 0.0f;
 }
 
-void Camera::move(Point inRelative)
+void Camera::move(const Vector3D<float>& inRelative)
+{
+    mFocus += inRelative;
+}
+
+void Camera::smartPan(Point inRelative)
 {
     for (size_t i = 0; i < 2; ++i)
     {
-        bool neg = inRelative[i] < 0.0f;
-        inRelative[i] = fabs(inRelative[i]);
-
-        if (inRelative[i] < 0.5f)
-        {
-            inRelative[i] = 0.0f;
-            continue;
-        }
-        else
-        {
-            inRelative[i] -= 0.5f;
-            inRelative[i] += 1.0f;
-            inRelative[i] = pow(inRelative[i], 3.0f);
-            inRelative[i] -= 1.0f;
-        }
-
-        if (neg) inRelative[i] = -inRelative[i];
-        inRelative[i] *= 0.015f * mTrackball[2];
+        inRelative[i] *= mTrackball[2] * 0.05f;
     }
 
     float r = TO_RADIANS(mTrackball[1]);

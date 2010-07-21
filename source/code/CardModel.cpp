@@ -14,16 +14,22 @@ CardModel::~CardModel()
 {
 }
 
+void CardModel::display(GLuint inFront)
+{
+    glBindTexture(GL_TEXTURE_2D, inFront);
+    mVertices.displayIndexed(mIndices[0]);
+}
+
 void CardModel::display(GLuint inFront, GLuint inBack)
 {
+    mCardProgram->useTexture(false);
+    mVertices.displayIndexed(mIndices[1]);
+
     mCardProgram->useTexture(true);
     glBindTexture(GL_TEXTURE_2D, inFront);
     mVertices.displayIndexed(mIndices[0]);
     glBindTexture(GL_TEXTURE_2D, inBack);
     mVertices.displayIndexed(mIndices[2]);
-
-    mCardProgram->useTexture(false);
-    mVertices.displayIndexed(mIndices[1]);
 }
 
 void CardModel::build()

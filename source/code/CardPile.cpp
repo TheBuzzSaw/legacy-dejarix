@@ -15,35 +15,28 @@
  *  along with Dejarix.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#include "CardPile.h"
 
-#include "Matrix3D.h"
-#include "Vector3D.h"
-#include "Vector2D.h"
-
-class Camera
+CardPile::CardPile() : mGhost(0), mCascade(false)
 {
-    public:
-        Camera();
-        ~Camera();
+}
 
-        void update();
-        void spin(float inOffset);
-        void rise(float inOffset);
-        void zoom(float inOffset);
-        void move(const Vector3D<float>& inRelative);
-        void smartPan(Point inRelative);
+CardPile::~CardPile()
+{
+}
 
-        inline const Matrix3D& matrix()
-        {
-            return mMatrix;
-        }
+CardInstance* CardPile::getFront()
+{
+    if (mCards.empty()) return NULL;
+    CardInstance* outCardInstance = mCards.front();
+    mCards.pop_front();
+    return outCardInstance;
+}
 
-    private:
-        Matrix3D mMatrix;
-        Vector3D<float> mFocus;
-        Vector3D<float> mTrackball;
-};
-
-#endif
+CardInstance* CardPile::getBack()
+{
+    if (mCards.empty()) return NULL;
+    CardInstance* outCardInstance = mCards.back();
+    mCards.pop_back();
+    return outCardInstance;
+}

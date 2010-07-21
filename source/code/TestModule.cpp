@@ -86,14 +86,14 @@ void TestModule::onLoad()
     fin.close();
 
     GLfloat tableVertices[12] = {
-        100.0f, 100.0f, 0.0f,
-        100.0f, -100.0f, 0.0f,
-        -100.0f, -100.0f, 0.0f,
-        -100.0f, 100.0f, 0.0f};
+        500.0f, 500.0f, 0.0f,
+        500.0f, -500.0f, 0.0f,
+        -500.0f, -500.0f, 0.0f,
+        -500.0f, 500.0f, 0.0f};
 
     GLfloat tableTextures[8] = {
-        0.0f, 0.0f, 20.0f, 0.0f,
-        20.0f, 20.0f, 0.0f, 20.0f};
+        0.0f, 0.0f, 100.0f, 0.0f,
+        100.0f, 100.0f, 0.0f, 100.0f};
 
     mTable.loadVAA(CardProgram::VERTEX, 3, 4, tableVertices);
     mTable.loadVAA(CardProgram::TEXTURE, 2, 4, tableTextures);
@@ -103,12 +103,12 @@ void TestModule::onLoad()
     glGetIntegerv(GL_VIEWPORT, mViewport.array());
     mProjection.perspective(30.0f, DisplayEngine::getAspectRatio(), 1.0f,
         1000.0f);
-    for (size_t i = 0; i < 16; ++i) mProjectionArray[i] = mProjection[i];
     mModelView.reset();
     mCamera.zoom(18.0f);
     mSpin = false;
     mKeyState = SDL_GetKeyState(NULL);
     mCurrentTexture = 1;
+    mCardProgram.useTexture(true);
 }
 
 void TestModule::onUnload()
@@ -152,7 +152,6 @@ void TestModule::onLoop()
     mModelView.pop();
 
     static const Vector3D<float> tableColor(0.0f);
-    mCardProgram.useTexture(true);
     mCardProgram.setColor(tableColor);
     (mMVPM = mProjection).multiply(mModelView.matrix());
     mCardProgram.setMatrix(mMVPM);
@@ -164,15 +163,6 @@ void TestModule::onLoop()
 
 void TestModule::onFrame()
 {
-    Pixel relative;
-    relative[0] = mMouseCoordinates[0] - mWindowCenter[0];
-    relative[1] = mWindowCenter[1] - mMouseCoordinates[1];
-
-    Point toMove;
-    toMove[0] = float(relative[0]) / float(mWindowCenter[0]);
-    toMove[1] = float(relative[1]) / float(mWindowCenter[1]);
-
-    mCamera.move(toMove);
     if (mSpin) mCamera.spin(0.5f);
     mCamera.update();
     processPosition();

@@ -9,6 +9,7 @@ CardProgram::CardProgram() : ShaderProgram(2)
     glBindAttribLocation(handle(), TEXTURE, "CardTextureCoordinate");
     linkAndBind();
     glUniform1i(mUniformCardTexture, 0);
+    useTexture(true);
 }
 
 CardProgram::~CardProgram()

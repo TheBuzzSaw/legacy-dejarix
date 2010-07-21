@@ -19,6 +19,10 @@
 #include "DisplayEngine.h"
 #include "SoundEngine.h"
 #include "TestModule.h"
+#include "TableModule.h"
+
+#include <iostream>
+using namespace std;
 
 int main(int argc, char** argv)
 {
@@ -26,7 +30,24 @@ int main(int argc, char** argv)
     DisplayEngine::initialize();
     //SoundEngine::initialize();
     //Config::outputSettings();
-    DisplayEngine::start(new TestModule);
+    Module* m;
+
+    try
+    {
+        m = new TableModule;
+    }
+    catch (const Shader::Exception& se)
+    {
+        cerr << "shader exception -- " << se.reason << endl;
+        m = NULL;
+    }
+    catch (...)
+    {
+        cerr << "unknown exception" << endl;
+        m = NULL;
+    }
+
+    if (m) DisplayEngine::start(m);
     //SoundEngine::cleanup();
     Config::finalize();
     return 0;

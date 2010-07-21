@@ -15,35 +15,32 @@
  *  along with Dejarix.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef CARDPILE_H
+#define CARDPILE_H
 
-#include "Matrix3D.h"
-#include "Vector3D.h"
-#include "Vector2D.h"
+#include <list>
 
-class Camera
+#include "CardInstance.h"
+#include "CardModel.h"
+
+class CardPile
 {
     public:
-        Camera();
-        ~Camera();
+        CardPile();
+        ~CardPile();
 
-        void update();
-        void spin(float inOffset);
-        void rise(float inOffset);
-        void zoom(float inOffset);
-        void move(const Vector3D<float>& inRelative);
-        void smartPan(Point inRelative);
+        inline size_t size() const { return mCards.size(); }
+        inline bool isTemporary() { return !mGhost; }
+        inline bool isEmpty() { return mCards.empty(); }
+        inline void remove(CardInstance* inCard) { mCards.remove(inCard); }
 
-        inline const Matrix3D& matrix()
-        {
-            return mMatrix;
-        }
+        CardInstance* getFront();
+        CardInstance* getBack();
 
     private:
-        Matrix3D mMatrix;
-        Vector3D<float> mFocus;
-        Vector3D<float> mTrackball;
+        std::list<CardInstance*> mCards;
+        GLuint mGhost;
+        bool mCascade;
 };
 
 #endif

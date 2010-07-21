@@ -15,35 +15,37 @@
  *  along with Dejarix.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef CAMERA_H
-#define CAMERA_H
+#ifndef CARDINSTANCE_H
+#define CARDINSTANCE_H
 
 #include "Matrix3D.h"
 #include "Vector3D.h"
 #include "Vector2D.h"
+#include "CardModel.h"
+#include "OGL.h"
 
-class Camera
+class CardInstance
 {
     public:
-        Camera();
-        ~Camera();
+        CardInstance(GLuint inFront, GLuint inBack);
+        ~CardInstance();
 
-        void update();
-        void spin(float inOffset);
-        void rise(float inOffset);
-        void zoom(float inOffset);
-        void move(const Vector3D<float>& inRelative);
-        void smartPan(Point inRelative);
+        inline const Matrix3D& matrix() { return mMatrix; }
+        inline const Vector3D<float>& getPosition() { return mTranslate; }
+        inline GLuint front() { return mFront; }
+        inline GLuint back() { return mBack; }
 
-        inline const Matrix3D& matrix()
-        {
-            return mMatrix;
-        }
+        void setPosition(const Vector3D<float>& inVector);
+        bool isInside(const Vector3D<float>& inVector);
 
     private:
+        void update();
+
         Matrix3D mMatrix;
-        Vector3D<float> mFocus;
-        Vector3D<float> mTrackball;
+        Vector3D<float> mTranslate;
+        Point mRotate; // 0 -- flip, 1 -- rotate
+        GLuint mFront;
+        GLuint mBack;
 };
 
 #endif

@@ -15,23 +15,24 @@
  *  along with Dejarix.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TESTMODULE_H
-#define TESTMODULE_H
+#ifndef TABLEMODULE_H
+#define TABLEMODULE_H
 
 #include "Module.h"
 #include "CardProgram.h"
 #include "CardModel.h"
+#include "CardInstance.h"
 #include "MatrixStack.h"
 #include "Camera.h"
 #include "Vector2D.h"
 
-#define NUM_TEXTURES 61
+#include <list>
 
-class TestModule : public Module
+class TableModule : public Module
 {
     public:
-        TestModule();
-        virtual ~TestModule();
+        TableModule();
+        virtual ~TableModule();
 
         enum MouseModes { NONE, DRAGGING };
 
@@ -44,43 +45,55 @@ class TestModule : public Module
         virtual void onUnload();
 
     protected:
-        static bool unproject(float inX, float inY, float inZ,
-            const Matrix3D& inMVM, const Matrix3D& inPM,
-            const Vector3D<int>& inViewport, Vector3D<float>& inResult);
-        static void transformPoint(const Matrix3D& inMatrix,
-            const Vector3D<float>& inVector, Vector3D<float>& inResult);
+        void processPosition();
 
-        virtual void onKeyDown(SDLKey inSym, SDLMod inMod, Uint16 inUnicode);
         virtual void onMouseWheel(bool inUp, bool inDown);
         virtual void onMouseMove(int inX, int inY, int inRelX, int inRelY,
             bool inLeft, bool inRight, bool inMiddle);
         virtual void onLButtonDown(int inX, int inY);
         virtual void onLButtonUp(int inX, int inY);
         virtual void onRButtonDown(int inX, int inY);
+        virtual void onRButtonUp(int inX, int inY);
+        virtual void onKeyDown(SDLKey inSym, SDLMod inMod, Uint16 inUnicode);
+        virtual void onKeyUp(SDLKey inSym, SDLMod inMod, Uint16 inUnicode);
+
+        static bool unproject(float inX, float inY, float inZ,
+            const Matrix3D& inMVM, const Matrix3D& inPM,
+            const Vector3D<int>& inViewport, Vector3D<float>& inResult);
+        static void transformPoint(const Matrix3D& inMatrix,
+            const Vector3D<float>& inVector, Vector3D<float>& inResult);
 
     private:
         void loadCardImage(const char* inFile, GLuint inTexture);
-        void processPosition();
+        GLuint generateTexture();
+
+        GLuint mTextures[200];
+        size_t mLoadedTextures;
 
         Camera mCamera;
+        Vector3D<GLint> mViewport;
         MatrixStack mModelView;
         Matrix3D mProjection;
+        Matrix3D mProjectionHUD;
         Matrix3D mMVPM;
+
         CardProgram mCardProgram;
-        ShaderVBO mTable;
-        CardModel mCard;
-        GLuint mTextures[NUM_TEXTURES];
+        ShaderVBO mTableVBO;
+        GLuint mTableTexture;
+        CardModel mCardModel;
+        std::list<CardInstance*> mCards;
+        CardInstance* mCardSelect;
+
+        int mFixedY;
         Pixel mMouseCoordinates;
         Pixel mWindowCenter;
+        Point mSmartPanning;
         Vector3D<GLfloat> mPointer;
         Vector3D<GLfloat> mDragAnchor;
-        Vector3D<GLfloat> mCardDragSource;
-        Vector3D<GLfloat> mCardTranslate;
-        Vector3D<GLfloat> mCardColor;
-        Vector3D<GLint> mViewport;
+        Vector3D<GLfloat> mCardAnchor;
         MouseModes mMouseMode;
-        bool mSpin;
-        size_t mCurrentTexture;
+        GLfloat mDepthZ;
+
         Uint8* mKeyState;
 };
 

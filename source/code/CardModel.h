@@ -13,6 +13,7 @@ class CardModel
         ~CardModel();
 
         void build();
+        void display(GLuint inFront);
         void display(GLuint inFront, GLuint inBack);
 
     private:
