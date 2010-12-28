@@ -193,11 +193,24 @@ void TableModule::onLoop()
     glReadPixels(mMouseCoordinates[0], mFixedY, 1, 1, GL_DEPTH_COMPONENT,
         GL_FLOAT, &mDepthZ);
 
+    mModelView.pop();
+
+    if (mCardSelect && mMouseMode != DRAGGING)
+    {
+        mModelView.push();
+        float x = mMouseCoordinates[0] > mWindowCenter[0] ? -5.0f : 5.0f;
+        mModelView.matrix().translate(x, 0.0f, -18.0f);
+        (mMVPM = mProjection).multiply(mModelView.matrix());
+        mCardProgram.setMatrix(mMVPM);
+        glDisable(GL_DEPTH_TEST);
+        mCardModel.display(mCardSelect->front(), mCardSelect->back());
+        glEnable(GL_DEPTH_TEST);
+        mModelView.pop();
+    }
+
     /// draw HUD
     //glClear(GL_DEPTH_BUFFER_BIT);
     //(mMVPM = mProjectionHUD).multiply(mModelView.matrix());
-
-    mModelView.pop();
 }
 
 void TableModule::processPosition()

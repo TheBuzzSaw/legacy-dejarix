@@ -272,6 +272,7 @@ void DisplayEngine::initialize()
 #endif
 
     Uint32 flags = SDL_OPENGL;
+    flags |= SDL_NOFRAME;
 
     if (Config::get<int>("full screen", 0) == 1) flags |= SDL_FULLSCREEN;
 

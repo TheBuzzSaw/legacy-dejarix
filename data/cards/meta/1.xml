@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<card>
+  <gametext>Each pilot deploys -1 (or -2 if with an admiral) aboard a capital starship. Each capital starship with a pilot character aboard is immune to attrition &lt; 4 (or adds 2 to immunity). During each of your control phases, opponent loses 1 Force for each battleground site your general or commander controls that is related to a system you occupy.</gametext>
+  <created-at type="datetime">2010-12-27T13:55:58Z</created-at>
+  <side>Light</side>
+  <vslip-back-image-updated-at type="datetime" nil="true"/>
+  <card-type>Admiral's Order</card-type>
+  <rarity>R</rarity>
+  <title>Capital Support</title>
+  <vslip-image-content-type nil="true"/>
+  <card-back-image-file-name nil="true"/>
+  <card-image-updated-at type="datetime">2010-12-27T13:55:45Z</card-image-updated-at>
+  <updated-at type="datetime">2010-12-27T13:55:58Z</updated-at>
+  <card-back-image-content-type nil="true"/>
+  <card-back-image-updated-at type="datetime" nil="true"/>
+  <lore nil="true"/>
+  <card-image-file-name>capitalsupport.gif</card-image-file-name>
+  <id type="integer">1</id>
+  <vslip-back-image-file-name nil="true"/>
+  <vslip-image-file-name nil="true"/>
+  <vslip-image-file-size type="integer" nil="true"/>
+  <card-image-file-size type="integer">54175</card-image-file-size>
+  <subtype nil="true"/>
+  <vslip-image-updated-at type="datetime" nil="true"/>
+  <card-back-image-file-size type="integer" nil="true"/>
+  <vslip-back-image-content-type nil="true"/>
+  <expansion>Death Star II</expansion>
+  <card-image-content-type>image/gif</card-image-content-type>
+  <uniqueness>•</uniqueness>
+  <vslip-back-image-file-size type="integer" nil="true"/>
+</card>
