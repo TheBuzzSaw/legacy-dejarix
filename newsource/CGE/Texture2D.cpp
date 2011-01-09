@@ -1,5 +1,4 @@
 #include "Texture2D.h"
-#include "Tools.h"
 
 namespace CGE
 {

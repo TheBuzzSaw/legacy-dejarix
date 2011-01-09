@@ -1,5 +1,7 @@
 #include "CubeMap.h"
-#include "Tools.h"
+
+#include <iostream>
+using namespace std;
 
 namespace CGE
 {
