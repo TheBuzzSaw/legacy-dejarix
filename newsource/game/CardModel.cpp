@@ -9,23 +9,23 @@ CardModel::~CardModel()
 {
 }
 
-void CardModel::display(GLtexture inFront, GLtexture inBack)
+void CardModel::display(GLuniform inSwitch, const CGE::Texture2D& inFront,
+    const CGE::Texture2D& inBack)
 {
-    // TODO: disable textures
+    glUniform1i(inSwitch, 0);
     mVBO.display(mMiddleIVBO);
 
-    // TODO: enable textures
-    glBindTexture(GL_TEXTURE_2D, inFront);
+    glUniform1i(inSwitch, 1);
+    inFront.bind();
     mVBO.display(mTopIVBO);
-    glBindTexture(GL_TEXTURE_2D, inBack);
+    inBack.bind();
     mVBO.display(mBottomIVBO);
 }
 
 void CardModel::build(float inWidth, float inHeight, float inDepth,
     float inRadius, int inDetail)
-
 {
-    if (inDetail < 1 || inRadius <= 0.0f)
+    //if (inDetail < 1 || inRadius <= 0.0f)
     {
         buildSimple(inWidth, inHeight, inDepth);
         return;
@@ -52,14 +52,14 @@ void CardModel::buildSimple(float inWidth, float inHeight, float inDepth)
     mVBO.loadVAA(0, 3, 8, points);
 
     GLfloat textureCoordinates[16] = {
-        1.0f, 1.0f,
-        1.0f, 0.0f,
-        0.0f, 0.0f,
-        0.0f, 1.0f,
-        0.0f, 1.0f,
-        0.0f, 0.0f,
         1.0f, 0.0f,
         1.0f, 1.0f,
+        0.0f, 1.0f,
+        0.0f, 0.0f,
+        0.0f, 0.0f,
+        0.0f, 1.0f,
+        1.0f, 1.0f,
+        1.0f, 0.0f
         };
 
     float ratio = inWidth / inHeight;

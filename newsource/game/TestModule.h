@@ -5,6 +5,7 @@
 #include <CGE/Program.h>
 #include <CGE/ClusterVBO.h>
 #include <CGE/Matrix4x4.h>
+#include <CGE/CubeMap.h>
 
 class TestModule : public CGE::Module
 {
@@ -26,7 +27,8 @@ class TestModule : public CGE::Module
         CGE::ClusterVBO<3> mVBO;
         CGE::IndexVBO mIVBO;
 
-        GLuint mTexture;
+        CGE::CubeMap mCubeMap;
+
         GLint mUniMVPM;
         GLint mUniMVM;
         GLint mUniNM;

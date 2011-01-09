@@ -45,9 +45,13 @@
 			<Add library="GL" />
 		</Linker>
 		<Unit filename="../CGE/ClusterVBO.h" />
+		<Unit filename="../CGE/CubeMap.cpp" />
+		<Unit filename="../CGE/CubeMap.h" />
 		<Unit filename="../CGE/Engine.cpp" />
 		<Unit filename="../CGE/Engine.h" />
 		<Unit filename="../CGE/Graphics.h" />
+		<Unit filename="../CGE/Image.cpp" />
+		<Unit filename="../CGE/Image.h" />
 		<Unit filename="../CGE/IndexVBO.cpp" />
 		<Unit filename="../CGE/IndexVBO.h" />
 		<Unit filename="../CGE/ManagedModule.cpp" />
@@ -55,14 +59,17 @@
 		<Unit filename="../CGE/Matrix4x4.h" />
 		<Unit filename="../CGE/Module.cpp" />
 		<Unit filename="../CGE/Module.h" />
+		<Unit filename="../CGE/Platforms.h" />
 		<Unit filename="../CGE/Program.h" />
 		<Unit filename="../CGE/PropertyList.cpp" />
 		<Unit filename="../CGE/PropertyList.h" />
 		<Unit filename="../CGE/Shader.cpp" />
 		<Unit filename="../CGE/Shader.h" />
-		<Unit filename="../CGE/Tools.cpp" />
-		<Unit filename="../CGE/Tools.h" />
-		<Unit filename="../CGE/Vector3D.h" />
+		<Unit filename="../CGE/Texture.cpp" />
+		<Unit filename="../CGE/Texture.h" />
+		<Unit filename="../CGE/Texture2D.cpp" />
+		<Unit filename="../CGE/Texture2D.h" />
+		<Unit filename="../CGE/Vectors.h" />
 		<Unit filename="../GLee/GLee.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -81,6 +88,8 @@
 		<Unit filename="../game/CardTable.h" />
 		<Unit filename="../game/CardTransform.cpp" />
 		<Unit filename="../game/CardTransform.h" />
+		<Unit filename="../game/TableModule.cpp" />
+		<Unit filename="../game/TableModule.h" />
 		<Unit filename="../game/TestModule.cpp" />
 		<Unit filename="../game/TestModule.h" />
 		<Unit filename="../game/main.cpp" />

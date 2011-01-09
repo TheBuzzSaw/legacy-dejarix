@@ -4,35 +4,43 @@
 #include "Graphics.h"
 #include "ManagedModule.h"
 
+#include <iostream>
+
 namespace CGE
 {
     const Uint32 ENGINE_FPS = 40;
     const Uint32 FRAME_LENGTH = 1000 / ENGINE_FPS;
 
-    struct ColorMask
-    {
-        Uint32 red;
-        Uint32 green;
-        Uint32 blue;
-        Uint32 alpha;
-    };
-
     class Engine
     {
         public:
-            Engine();
+            struct Settings
+            {
+                Settings() : windowTitle(NULL), windowTitle2(NULL) {}
+
+                const char* windowTitle;
+                const char* windowTitle2;
+            };
+
+            Engine(const Settings& inSettings = Settings());
             ~Engine();
 
             void run(Module* inModule);
             void manage(ManagedModule* inModule);
 
         private:
-            ColorMask mMask;
+            void initialize();
+
             PropertyList mConfig;
             Surface mDisplay;
             Surface mWindowIcon;
             SDL_Rect** mModes;
-            Uint32 mFPS;
+            Settings mSettings;
+
+            static void logOpenGL(std::ostream& inStream);
+            static void prepareFiles();
+            static const char* logFile;
+            static const char* configFile;
     };
 }
 

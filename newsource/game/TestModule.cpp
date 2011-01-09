@@ -1,6 +1,6 @@
 #include "TestModule.h"
 
-#include <CGE/Vector3D.h>
+#include <CGE/Vectors.h>
 #include <CGE/Tools.h>
 
 #define FOV 30.0f
@@ -53,19 +53,11 @@ GLfloat normals[24] = {
 
 TestModule::TestModule() : mRotate(0.0f)
 {
-    glGenTextures(1, &mTexture);
-
-    Surface pics[6];
-    const char* path = "data/images/wood.jpg";
-    pics[0] = CGE::loadImage(path);
-    pics[1] = CGE::loadImage(path);
-    pics[2] = CGE::loadImage(path);
-    pics[3] = CGE::loadImage(path);
-    pics[4] = CGE::loadImage(path);
-    pics[5] = CGE::loadImage(path);
-
-    CGE::loadCubeMap(pics, mTexture);
-    for (size_t i = 0; i < 6; ++i) SDL_FreeSurface(pics[i]);
+    {
+        CGE::Image i("data/images/wood.jpg");
+        const CGE::Image* ip[] = { &i, &i, &i, &i, &i, &i };
+        mCubeMap.loadImages(ip);
+    }
 
     mVS.loadFromFile("data/shaders/test.vs", GL_VERTEX_SHADER);
     mFS.loadFromFile("data/shaders/test.fs", GL_FRAGMENT_SHADER);
@@ -84,27 +76,27 @@ TestModule::TestModule() : mRotate(0.0f)
     u = mProgram.getUniformLocation("cubeMap");
     glUniform1i(u, 0);
 
-    vec4f v(0.1f, 0.1f, 0.1f, 1.0f);
+    vec4f v = {0.1f, 0.1f, 0.1f, 1.0f};
     u = mProgram.getUniformLocation("ambientColor");
-    glUniform4fv(u, 1, v.array());
+    glUniform4fv(u, 1, v);
 
     u = mProgram.getUniformLocation("diffuseColor");
     v[0] = 1.0f;
     v[1] = 1.0f;
     v[2] = 1.0f;
-    glUniform4fv(u, 1, v.array());
+    glUniform4fv(u, 1, v);
 
     u = mProgram.getUniformLocation("specularColor");
     v[0] = 1.0f;
     v[1] = 1.0f;
     v[2] = 1.0f;
     v[3] = 0.0f;
-    glUniform4fv(u, 1, v.array());
+    glUniform4fv(u, 1, v);
 
     u = mProgram.getUniformLocation("lightPosition");
     v[0] = 5.0f;
     v[2] = 100.0f;
-    glUniform3fv(u, 1, v.array());
+    glUniform3fv(u, 1, v);
 
     mVBO.loadVAA(0, 3, 8, points);
     mVBO.loadVAA(1, 4, 8, colors);
@@ -114,7 +106,6 @@ TestModule::TestModule() : mRotate(0.0f)
 
 TestModule::~TestModule()
 {
-    glDeleteTextures(1, &mTexture);
 }
 
 void TestModule::onOpen()
@@ -126,7 +117,7 @@ void TestModule::onOpen()
     glCullFace(GL_BACK);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, mTexture);
+    mCubeMap.bind();
 
     glClearColor(0.0f, 0.0f, 0.2f, 0.0f);
 }

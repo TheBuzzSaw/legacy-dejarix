@@ -2,6 +2,7 @@
 #define CARDMODEL_H
 
 #include <CGE/ClusterVBO.h>
+#include <CGE/Texture2D.h>
 
 class CardModel
 {
@@ -9,7 +10,8 @@ class CardModel
         CardModel();
         ~CardModel();
 
-        void display(GLtexture inFront, GLtexture inBack);
+        void display(GLuniform inSwitch, const CGE::Texture2D& inFront,
+            const CGE::Texture2D& inBack);
 
     private:
         void build(float inWidth, float inHeight, float inDepth, float inRadius,
