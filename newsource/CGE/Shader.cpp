@@ -1,16 +1,14 @@
 #include "Shader.h"
+#include "Exception.h"
 
 #include <cstdio>
 
 namespace CGE
 {
-    Shader::Shader() : mHandle(0)
-    {
-    }
+    const char* Shader::mFile = "(direct buffer)";
 
-    Shader::Shader(const char* inFile, GLenum inType) : mHandle(0)
+    Shader::Shader(GLenum inType) : mHandle(0), mType(inType)
     {
-        loadFromFile(inFile, inType);
     }
 
     Shader::~Shader()
@@ -18,31 +16,36 @@ namespace CGE
         unload();
     }
 
-    void Shader::loadFromFile(const char* inFile, GLenum inType)
+    void Shader::loadFromFile(const char* inFile)
     {
-        if (mHandle || !inFile) return;
+        static const char* functionName = "Shader::loadFromFile";
+
+        if (mHandle || !inFile || !*inFile) return;
 
         char* source = fileToBuffer(inFile);
         if (!source)
         {
-            // TODO: report error
-            return;
+            std::string message("failed to convert ");
+            message += inFile;
+            message += " to buffer";
+            throw Exception(functionName, message);
         }
 
-        loadFromBuffer(source, inType);
+        const char* temp = mFile;
+        mFile = inFile;
+        loadFromBuffer(source);
+        mFile = temp;
 
         delete [] source;
     }
 
-    void Shader::loadFromBuffer(const char* inBuffer, GLenum inType)
+    void Shader::loadFromBuffer(const char* inBuffer)
     {
-        if (!mHandle) mHandle = glCreateShader(inType);
+        static const char* functionName = "Shader::loadFromBuffer";
 
-        if (!mHandle)
-        {
-            // TODO: report error
-            return;
-        }
+        if (!mHandle) mHandle = glCreateShader(mType);
+
+        if (!mHandle) throw Exception(functionName, "failed to create shader");
 
         glShaderSource(mHandle, 1, const_cast<const GLchar**>(&inBuffer), 0);
         glCompileShader(mHandle);
@@ -51,14 +54,19 @@ namespace CGE
         glGetShaderiv(mHandle, GL_COMPILE_STATUS, &compiled);
         if (!compiled)
         {
-            // TODO: convert to XPG exception
             GLchar log[2048];
             GLsizei length;
             glGetShaderInfoLog(mHandle, 2048, &length, log);
-            printf("-- shader compiler errors --\n%s\n", log);
 
             glDeleteShader(mHandle);
             mHandle = 0;
+
+            std::string message("shader compiler errors -- ");
+            message += mFile;
+            message += '\n';
+            message += log;
+
+            throw Exception(functionName, message);
         }
     }
 
@@ -70,29 +78,20 @@ namespace CGE
     char* Shader::fileToBuffer(const char* inFile)
     {
         FILE *f;
-        size_t length;
-        size_t r;
-        char* outBuffer;
 
-        if (!(f = fopen(inFile, "r")))
-        {
-            // TODO: report error
-            return NULL;
-        }
+        if (!(f = fopen(inFile, "r"))) return NULL;
 
         fseek(f, 0, SEEK_END);
-        length = ftell(f);
+        size_t length = ftell(f);
 
         fseek(f, 0, SEEK_SET);
 
-        outBuffer = static_cast<char*>(malloc((length + 1) * sizeof(char)));
-        if (!outBuffer)
-        {
-            // TODO: report error
-            return NULL;
-        }
+        char *outBuffer = static_cast<char*>(malloc((length + 1)
+            * sizeof(char)));
 
-        r = fread(outBuffer, sizeof(char), length, f);
+        if (!outBuffer) return NULL;
+
+        size_t r = fread(outBuffer, sizeof(char), length, f);
         outBuffer[length] = '\0';
         fclose(f);
 

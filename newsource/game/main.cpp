@@ -60,6 +60,7 @@ int main(int argc, char** argv)
     CGE::Engine::Settings s;
     s.windowTitle = "DEJARIX alpha build";
     s.windowTitle2 = "DEJARIX";
+
     CGE::Engine e(s);
     e.manage(new TableModule);
     return 0;

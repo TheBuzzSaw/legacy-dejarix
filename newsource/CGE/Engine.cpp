@@ -2,14 +2,20 @@
 #include "Module.h"
 #include "Platforms.h"
 #include "Image.h"
+#include "Exception.h"
+#include "Sound.h"
 
 #include <SDL_ttf.h>
 #include <SDL_net.h>
+#include <SDL_mixer.h>
 
 #include <ctime>
 #include <fstream>
 #include <string>
 #include <list>
+
+#include <stdio.h>
+#include <stdlib.h>
 
 namespace CGE
 {
@@ -80,9 +86,7 @@ namespace CGE
             fout.close();
         }
 
-#ifndef __APPLE__
-        SDL_FreeSurface(mWindowIcon);
-#endif
+        Mix_CloseAudio();
         SDLNet_Quit();
         TTF_Quit();
         SDL_Quit();
@@ -95,14 +99,14 @@ namespace CGE
         inModule->onOpen();
         inModule->onResize(mDisplay->w, mDisplay->h);
 
-        Uint32 nextFrame = SDL_GetTicks() + FRAME_LENGTH;
+        Uint32 nextPulse = SDL_GetTicks() + mSettings.frameLength;
         Uint32 nextSecond = SDL_GetTicks() + 1000;
         Uint32 framesPerSecond = 0;
 
         while (inModule->isRunning())
         {
             SDL_Event event;
-            while (SDL_PollEvent(&event)) inModule->onEvent(&event);
+            while (SDL_PollEvent(&event)) inModule->onEvent(event);
 
             Uint32 ticks = SDL_GetTicks();
 
@@ -112,10 +116,10 @@ namespace CGE
                 framesPerSecond = 0;
             }
 
-            if (ticks > nextFrame)
+            if (ticks > nextPulse)
             {
-                inModule->onFrame();
-                nextFrame += FRAME_LENGTH;
+                inModule->onPulse();
+                nextPulse += mSettings.frameLength;
             }
             else
             {
@@ -139,13 +143,27 @@ namespace CGE
 
         while (currentModule || moduleStack.size())
         {
-            if (!currentModule)
+            if (currentModule)
+            {
+                try
+                {
+                    currentModule->onLoad(mConfig);
+                }
+                catch (Exception inException)
+                {
+                    cerr << "exception -- " << inException.header
+                        << " -- \n    " << inException.message << '\n';
+
+                    delete currentModule;
+                    currentModule = NULL;
+                    continue;
+                }
+            }
+            else
             {
                 currentModule = moduleStack.back();
                 moduleStack.pop_back();
             }
-
-            currentModule->onLoad(mConfig);
 
             run(currentModule);
 
@@ -160,7 +178,6 @@ namespace CGE
             else
             {
                 moduleStack.push_back(deadModule);
-                deadModule = NULL;
             }
         }
     }
@@ -202,6 +219,8 @@ namespace CGE
             exit(1);
         }
 
+
+
         if (TTF_Init() == -1)
         {
             cerr << "-- error on TTF_Init -- " << TTF_GetError() << endl;
@@ -216,11 +235,28 @@ namespace CGE
             exit(1);
         }
 
+        if (Mix_OpenAudio(mConfig.get("audio rate", 22050),
+            mConfig.get("audio format", AUDIO_S16SYS),
+            mConfig.get("audio channels", 2),
+            mConfig.get("audio buffer size", 1024)) == -1)
+        {
+            cerr << "-- error on Mix_OpenAudio -- " << Mix_GetError() << endl;
+            fout.close();
+            exit(1);
+        }
+
+        Mix_AllocateChannels(NUM_CHANNELS);
+
 #ifdef __WIN32__
+        //ofstream console("CON");
+        //AllocConsole();
         // redirect output to screen (instead of text files)
         freopen("CON", "w", stdout);
         freopen("CON", "w", stderr);
+        //freopen("CON", "r+", stderr)
+        //console.close();
 #endif
+
 
         // get available full screen modes
         mModes = SDL_ListModes(NULL, SDL_FULLSCREEN);
@@ -259,9 +295,10 @@ namespace CGE
         mDisplay = SDL_SetVideoMode(width, height,
             mConfig.get("bits per pixel", 24), flags);
 
+
 #ifndef __APPLE__
         // OSX does not support window icons
-        setWindowIcon(Image("data/images/icon.bmp"));
+        Image("data/images/icon.bmp").setAsWindowIcon();
 #endif
 
         logOpenGL(fout);

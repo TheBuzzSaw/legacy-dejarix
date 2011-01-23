@@ -10,7 +10,7 @@ namespace CGE
     {
         public:
             Program();
-            ~Program();
+            virtual ~Program();
 
             void attachShader(const Shader& inShader);
             void attachShader(GLuint inShader);
@@ -19,7 +19,7 @@ namespace CGE
             GLint getUniformLocation(const GLchar* inName);
             void clear();
 
-            inline void use() { glUseProgram(mHandle); }
+            inline void use() const { glUseProgram(mHandle); }
 
         private:
             GLuint mHandle;

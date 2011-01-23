@@ -6,6 +6,8 @@
 #include <CGE/ClusterVBO.h>
 #include <CGE/Matrix4x4.h>
 #include <CGE/CubeMap.h>
+#include <CGE/VertexShader.h>
+#include <CGE/FragmentShader.h>
 
 class TestModule : public CGE::Module
 {
@@ -22,8 +24,8 @@ class TestModule : public CGE::Module
 
     private:
         CGE::Program<2> mProgram;
-        CGE::Shader mVS;
-        CGE::Shader mFS;
+        CGE::VertexShader mVS;
+        CGE::FragmentShader mFS;
         CGE::ClusterVBO<3> mVBO;
         CGE::IndexVBO mIVBO;
 

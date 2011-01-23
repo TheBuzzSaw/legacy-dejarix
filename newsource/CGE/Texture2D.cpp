@@ -6,6 +6,11 @@ namespace CGE
     {
     }
 
+    Texture2D::Texture2D(const Image& inImage) : Texture(GL_TEXTURE_2D)
+    {
+        loadImage(inImage);
+    }
+
     Texture2D::~Texture2D()
     {
     }

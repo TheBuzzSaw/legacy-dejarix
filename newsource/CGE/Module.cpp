@@ -22,25 +22,25 @@ namespace CGE
 
     void Module::onLoop()
     {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    void Module::onFrame()
+    void Module::onPulse()
     {
     }
 
     /// event handlers
-    void Module::onEvent(SDL_Event* inEvent)
+    void Module::onEvent(const SDL_Event& inEvent)
     {
-        switch (inEvent->type)
+        switch (inEvent.type)
         {
             case SDL_ACTIVEEVENT:
             {
-                switch (inEvent->active.state)
+                switch (inEvent.active.state)
                 {
                     case SDL_APPMOUSEFOCUS:
                     {
-                        if (inEvent->active.gain)
+                        if (inEvent.active.gain)
                             onMouseFocus();
                         else
                             onMouseBlur();
@@ -49,7 +49,7 @@ namespace CGE
                     }
                     case SDL_APPINPUTFOCUS:
                     {
-                        if (inEvent->active.gain)
+                        if (inEvent.active.gain)
                             onInputFocus();
                         else
                             onInputBlur();
@@ -58,7 +58,7 @@ namespace CGE
                     }
                     case SDL_APPACTIVE:
                     {
-                        if (inEvent->active.gain)
+                        if (inEvent.active.gain)
                             onRestore();
                         else
                             onMinimize();
@@ -71,45 +71,45 @@ namespace CGE
 
             case SDL_KEYDOWN:
             {
-                onKeyDown(inEvent->key.keysym.sym, inEvent->key.keysym.mod,
-                    inEvent->key.keysym.unicode);
+                onKeyDown(inEvent.key.keysym.sym, inEvent.key.keysym.mod,
+                    inEvent.key.keysym.unicode);
                 break;
             }
 
             case SDL_KEYUP:
             {
-                onKeyUp(inEvent->key.keysym.sym, inEvent->key.keysym.mod,
-                    inEvent->key.keysym.unicode);
+                onKeyUp(inEvent.key.keysym.sym, inEvent.key.keysym.mod,
+                    inEvent.key.keysym.unicode);
                 break;
             }
 
             case SDL_MOUSEMOTION:
             {
-                onMouseMove(inEvent->motion.x, inEvent->motion.y,
-                    inEvent->motion.xrel, inEvent->motion.yrel,
-                    inEvent->motion.state & SDL_BUTTON(SDL_BUTTON_LEFT),
-                    inEvent->motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT),
-                    inEvent->motion.state & SDL_BUTTON(SDL_BUTTON_MIDDLE));
+                onMouseMove(inEvent.motion.x, inEvent.motion.y,
+                    inEvent.motion.xrel, inEvent.motion.yrel,
+                    inEvent.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT),
+                    inEvent.motion.state & SDL_BUTTON(SDL_BUTTON_RIGHT),
+                    inEvent.motion.state & SDL_BUTTON(SDL_BUTTON_MIDDLE));
                 break;
             }
 
             case SDL_MOUSEBUTTONDOWN:
             {
-                switch (inEvent->button.button)
+                switch (inEvent.button.button)
                 {
                     case SDL_BUTTON_LEFT:
                     {
-                        onLButtonDown(inEvent->button.x, inEvent->button.y);
+                        onLButtonDown(inEvent.button.x, inEvent.button.y);
                         break;
                     }
                     case SDL_BUTTON_RIGHT:
                     {
-                        onRButtonDown(inEvent->button.x, inEvent->button.y);
+                        onRButtonDown(inEvent.button.x, inEvent.button.y);
                         break;
                     }
                     case SDL_BUTTON_MIDDLE:
                     {
-                        onMButtonDown(inEvent->button.x, inEvent->button.y);
+                        onMButtonDown(inEvent.button.x, inEvent.button.y);
                         break;
                     }
                 }
@@ -118,21 +118,21 @@ namespace CGE
 
             case SDL_MOUSEBUTTONUP:
             {
-                switch (inEvent->button.button)
+                switch (inEvent.button.button)
                 {
                     case SDL_BUTTON_LEFT:
                     {
-                        onLButtonUp(inEvent->button.x, inEvent->button.y);
+                        onLButtonUp(inEvent.button.x, inEvent.button.y);
                         break;
                     }
                     case SDL_BUTTON_RIGHT:
                     {
-                        onRButtonUp(inEvent->button.x, inEvent->button.y);
+                        onRButtonUp(inEvent.button.x, inEvent.button.y);
                         break;
                     }
                     case SDL_BUTTON_MIDDLE:
                     {
-                        onMButtonUp(inEvent->button.x, inEvent->button.y);
+                        onMButtonUp(inEvent.button.x, inEvent.button.y);
                         break;
                     }
                     case SDL_BUTTON_WHEELUP:
@@ -151,34 +151,34 @@ namespace CGE
 
             case SDL_JOYAXISMOTION:
             {
-                onJoyAxis(inEvent->jaxis.which, inEvent->jaxis.axis,
-                          inEvent->jaxis.value);
+                onJoyAxis(inEvent.jaxis.which, inEvent.jaxis.axis,
+                          inEvent.jaxis.value);
                 break;
             }
 
             case SDL_JOYBALLMOTION:
             {
-                onJoyBall(inEvent->jball.which, inEvent->jball.ball,
-                          inEvent->jball.xrel, inEvent->jball.yrel);
+                onJoyBall(inEvent.jball.which, inEvent.jball.ball,
+                          inEvent.jball.xrel, inEvent.jball.yrel);
                 break;
             }
 
             case SDL_JOYHATMOTION:
             {
-                onJoyHat(inEvent->jhat.which, inEvent->jhat.hat,
-                         inEvent->jhat.value);
+                onJoyHat(inEvent.jhat.which, inEvent.jhat.hat,
+                         inEvent.jhat.value);
                 break;
             }
             case SDL_JOYBUTTONDOWN:
             {
-                onJoyButtonDown(inEvent->jbutton.which,
-                    inEvent->jbutton.button);
+                onJoyButtonDown(inEvent.jbutton.which,
+                    inEvent.jbutton.button);
                 break;
             }
 
             case SDL_JOYBUTTONUP:
             {
-                onJoyButtonUp(inEvent->jbutton.which, inEvent->jbutton.button);
+                onJoyButtonUp(inEvent.jbutton.which, inEvent.jbutton.button);
                 break;
             }
 
@@ -195,7 +195,7 @@ namespace CGE
 
             case SDL_VIDEORESIZE:
             {
-                onResize(inEvent->resize.w, inEvent->resize.h);
+                onResize(inEvent.resize.w, inEvent.resize.h);
                 break;
             }
 
@@ -207,8 +207,8 @@ namespace CGE
 
             default:
             {
-                onUser(inEvent->user.type, inEvent->user.code,
-                    inEvent->user.data1, inEvent->user.data2);
+                onUser(inEvent.user.type, inEvent.user.code,
+                    inEvent.user.data1, inEvent.user.data2);
                 break;
             }
         }

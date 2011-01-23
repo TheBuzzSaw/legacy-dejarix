@@ -1,7 +1,6 @@
 #include "TestModule.h"
 
 #include <CGE/Vectors.h>
-#include <CGE/Tools.h>
 
 #define FOV 30.0f
 #define NCC 1.0f
@@ -59,8 +58,8 @@ TestModule::TestModule() : mRotate(0.0f)
         mCubeMap.loadImages(ip);
     }
 
-    mVS.loadFromFile("data/shaders/test.vs", GL_VERTEX_SHADER);
-    mFS.loadFromFile("data/shaders/test.fs", GL_FRAGMENT_SHADER);
+    mVS.loadFromFile("data/shaders/test.vs");
+    mFS.loadFromFile("data/shaders/test.fs");
     mProgram.attachShader(mVS);
     mProgram.attachShader(mFS);
     mProgram.bindAttribLocation(0, "in_Position");

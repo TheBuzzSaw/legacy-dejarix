@@ -19,6 +19,7 @@ namespace CGE
             virtual void onLoad(PropertyList& inList);
             virtual void onUnload();
 
+
         protected:
             bool mDead;
             ManagedModule* mNextModule;

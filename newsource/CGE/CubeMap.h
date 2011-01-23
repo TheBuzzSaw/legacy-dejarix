@@ -14,6 +14,18 @@ namespace CGE
 
             void loadImages(const Image* inImages[]);
             void loadFiles(const char* inFiles[]);
+
+        private:
+            CubeMap(const CubeMap& inCubeMap) : Texture(0)
+            {
+                // no copying
+            }
+
+            CubeMap& operator=(const CubeMap& inCubeMap)
+            {
+                // no copying
+                return *this;
+            }
     };
 }
 

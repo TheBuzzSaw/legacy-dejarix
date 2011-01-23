@@ -8,18 +8,20 @@
 
 namespace CGE
 {
-    const Uint32 ENGINE_FPS = 40;
-    const Uint32 FRAME_LENGTH = 1000 / ENGINE_FPS;
 
     class Engine
     {
         public:
             struct Settings
             {
-                Settings() : windowTitle(NULL), windowTitle2(NULL) {}
+                Settings() :
+                    windowTitle(NULL),
+                    windowTitle2(NULL),
+                    frameLength(25) {}
 
                 const char* windowTitle;
                 const char* windowTitle2;
+                Uint32 frameLength;
             };
 
             Engine(const Settings& inSettings = Settings());
