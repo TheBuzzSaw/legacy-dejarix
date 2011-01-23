@@ -7,20 +7,21 @@ namespace CGE
 {
     const char* Shader::mFile = "(direct buffer)";
 
-    Shader::Shader(GLenum inType) : mHandle(0), mType(inType)
+    Shader::Shader(GLenum inType) : mHandle(0)
     {
+        mHandle = glCreateShader(inType);
     }
 
     Shader::~Shader()
     {
-        unload();
+        if (mHandle) glDeleteShader(mHandle);
     }
 
     void Shader::loadFromFile(const char* inFile)
     {
         static const char* functionName = "Shader::loadFromFile";
 
-        if (mHandle || !inFile || !*inFile) return;
+        if (!inFile || !*inFile) return;
 
         char* source = fileToBuffer(inFile);
         if (!source)
@@ -43,10 +44,6 @@ namespace CGE
     {
         static const char* functionName = "Shader::loadFromBuffer";
 
-        if (!mHandle) mHandle = glCreateShader(mType);
-
-        if (!mHandle) throw Exception(functionName, "failed to create shader");
-
         glShaderSource(mHandle, 1, const_cast<const GLchar**>(&inBuffer), 0);
         glCompileShader(mHandle);
 
@@ -58,9 +55,6 @@ namespace CGE
             GLsizei length;
             glGetShaderInfoLog(mHandle, 2048, &length, log);
 
-            glDeleteShader(mHandle);
-            mHandle = 0;
-
             std::string message("shader compiler errors -- ");
             message += mFile;
             message += '\n';
@@ -68,11 +62,6 @@ namespace CGE
 
             throw Exception(functionName, message);
         }
-    }
-
-    void Shader::unload()
-    {
-        if (mHandle) glDeleteShader(mHandle);
     }
 
     char* Shader::fileToBuffer(const char* inFile)
